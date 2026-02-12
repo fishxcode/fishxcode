@@ -4,7 +4,7 @@
 
 ### Qu'est-ce que FishXCode ?
 
-FishXCode est une plateforme gratuite de service d'IA Coding destinee aux developpeurs. Elle offre des quotas d'API gratuits pour utiliser les principaux outils de programmation IA sans aucun cout.
+FishXCode est un relais AI Coding qui prend en charge les modeles Claude, Codex et Gemini sur plusieurs plateformes.
 
 ### Quels outils sont pris en charge ?
 

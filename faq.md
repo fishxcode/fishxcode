@@ -4,7 +4,7 @@
 
 ### FishXCode 是什么？
 
-FishXCode 是一个面向开发者的 AI Coding 公益服务平台，提供免费的 API 额度，帮助开发者零成本使用主流 AI 编程工具。
+FishXCode 是一个 AI Coding 中转站，支持 Claude、Codex、Gemini 模型在多种平台使用。
 
 ### 支持哪些工具？
 
