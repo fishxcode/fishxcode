@@ -466,7 +466,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/fishxcode' }
     ],
     footer: {
-      message: 'FishXCode - AI Coding 中转站',
+      message: '<a href="https://fishxcode.com" target="_blank">主站</a> | <a href="https://doc.fishxcode.com/feed.xml" target="_blank">RSS</a> | <a href="https://doc.fishxcode.com/feed.atom" target="_blank">Atom</a> | <a href="https://doc.fishxcode.com/sitemap.xml" target="_blank">Sitemap</a> | <a href="https://github.com/fishxcode" target="_blank">GitHub</a>',
       copyright: `Copyright © ${new Date().getFullYear()} FishXCode`
     }
   }
