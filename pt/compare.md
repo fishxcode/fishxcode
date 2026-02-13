@@ -12,6 +12,7 @@ Escolha a ferramenta de codificacao com IA ideal para o seu fluxo de trabalho. V
 | **RooCode** | Roo Veterinary | Extensao VSCode |
 | **Qwen Code** | Alibaba | Ferramenta CLI de terminal |
 | **Droid CLI** | Factory AI | Ferramenta CLI de terminal |
+| **OpenCode** | OpenCode AI | Ferramenta CLI de terminal (TUI) |
 
 ## Suporte de plataformas
 
@@ -23,6 +24,7 @@ Escolha a ferramenta de codificacao com IA ideal para o seu fluxo de trabalho. V
 | **RooCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Droid CLI** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| **OpenCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ## Integracao com IDE
 
@@ -34,6 +36,7 @@ Escolha a ferramenta de codificacao com IA ideal para o seu fluxo de trabalho. V
 | **RooCode** | - | :white_check_mark: | - |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | :white_check_mark: | - | - |
+| **OpenCode** | :white_check_mark: | - | - |
 
 ## Metodo de configuracao
 
@@ -45,6 +48,7 @@ Escolha a ferramenta de codificacao com IA ideal para o seu fluxo de trabalho. V
 | **RooCode** | - | - | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | - | JSON | CLI interativo |
+| **OpenCode** | :white_check_mark: | JSON | TUI interativo |
 
 ## Compatibilidade com FishXCode
 
@@ -56,6 +60,7 @@ Escolha a ferramenta de codificacao com IA ideal para o seu fluxo de trabalho. V
 | **RooCode** | :white_check_mark: Compativel | Facil | Configuracao do provedor via GUI |
 | **Qwen Code** | :white_check_mark: Compativel | Facil | Variaveis de ambiente |
 | **Droid CLI** | :white_check_mark: Compativel | Media | Requer edicao de arquivo JSON |
+| **OpenCode** | :white_check_mark: Compativel | Media | Requer edicao de arquivo JSON |
 
 ::: warning Gemini CLI ainda nao compativel
 O Gemini CLI atualmente nao suporta roteamento de API personalizado, o que o torna incompativel com o FishXCode. Se voce procura uma alternativa, confira as demais ferramentas compativeis listadas acima.
@@ -71,6 +76,7 @@ O Gemini CLI atualmente nao suporta roteamento de API personalizado, o que o tor
 | **RooCode** | Experiencia 100% grafica no VSCode, protocolo OpenAI Compatible, sem barreira de terminal |
 | **Qwen Code** | Modelos Qwen da Alibaba, otimizado para cenarios multilinguais, leve e simples |
 | **Droid CLI** | Suporte flexivel a modelos personalizados, janelas de contexto extra grandes, focado no terminal |
+| **OpenCode** | Interface TUI de codigo aberto, suporte a 75+ modelos, agentes build/plan integrados, integracao com GitHub Copilot |
 
 ## Como escolher
 

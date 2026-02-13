@@ -16,6 +16,7 @@ Ferramentas disponiveis atualmente:
 - **RooCode** — Extensao de IA para VS Code
 - **Qwen Code** — Ferramenta de programacao baseada no Qwen da Alibaba
 - **Droid CLI** — CLI leve para programacao com IA
+- **OpenCode** — Ferramenta terminal de codigo aberto para programacao com IA
 
 ### Como meus dados sao tratados?
 
@@ -39,12 +40,12 @@ Apos fazer login, acesse a [pagina de gerenciamento de tokens](https://fishxcode
 
 Os tokens permanecem ativos ate serem excluidos ou regenerados manualmente. Recomendamos renova-los periodicamente por questoes de seguranca.
 
-### Quais sao os limites do plano gratuito?
+### Quais sao os limites da cota de uso?
 
-Cada usuario recebe uma cota gratuita. A quantidade exata e ajustada dinamicamente conforme os recursos da plataforma. Consulte o console para verificar seu consumo atual.
+Cada usuario recebe uma cota de uso. A quantidade exata e ajustada dinamicamente conforme os recursos da plataforma. Consulte o console para verificar seu consumo atual.
 
 ::: warning Atencao
-Quando sua cota gratuita se esgotar, as requisicoes serao recusadas. Planeje seu uso com antecedencia.
+Quando sua cota se esgotar, as requisicoes serao recusadas. Planeje seu uso com antecedencia.
 :::
 
 ## Configuracao das ferramentas

@@ -13,14 +13,14 @@ hero:
       text: Comenzar
       link: /es/start
     - theme: alt
-      text: Usar con Codex
-      link: /es/codex
+      text: Usar con Claude
+      link: /es/start
 
 features:
-  - title: Uso gratuito
-    details: Cuotas gratuitas para desarrolladores para impulsar su flujo de trabajo AI Coding.
+  - title: Inicio rápido
+    details: Regístrate y comienza tu flujo de trabajo AI Coding en minutos.
   - title: Soporte multi-modelo
     details: Soporta Claude, Codex, Gemini y otros modelos de IA. Cambia según necesites.
   - title: Compatible multi-herramienta
-    details: Funciona con Claude Code, OpenAI Codex, Gemini CLI, RooCode, Qwen Code y Droid.
+    details: Funciona con Claude Code, OpenAI Codex, Gemini CLI, RooCode, Qwen Code, Droid y OpenCode.
 ---

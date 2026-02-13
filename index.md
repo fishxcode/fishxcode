@@ -13,14 +13,14 @@ hero:
       text: 开始使用
       link: /start
     - theme: alt
-      text: 在 Codex 中使用
-      link: /codex
+      text: 在 Claude 中使用
+      link: /start
 
 features:
-  - title: 免费使用
-    details: 为开发者提供免费额度，助力 AI Coding 开发。
+  - title: 开箱即用
+    details: 注册即可使用，快速接入 AI Coding 工作流。
   - title: 多模型支持
     details: 支持 Claude、Codex、Gemini 等主流 AI 模型，按需切换。
   - title: 多工具兼容
-    details: Claude Code、OpenAI Codex、Gemini CLI、RooCode、Qwen Code、Droid 全面支持。
+    details: Claude Code、OpenAI Codex、Gemini CLI、RooCode、Qwen Code、Droid、OpenCode 全面支持。
 ---

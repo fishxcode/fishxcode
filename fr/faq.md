@@ -16,6 +16,7 @@ Les outils actuellement compatibles :
 - **RooCode** — Extension IA pour VS Code
 - **Qwen Code** — Outil de programmation base sur Qwen d'Alibaba
 - **Droid CLI** — CLI leger pour la programmation IA
+- **OpenCode** — Outil terminal open source pour la programmation IA
 
 ### Qu'en est-il de la confidentialite de mes donnees ?
 
@@ -39,12 +40,12 @@ Apres connexion, accedez a la [page de gestion des tokens](https://fishxcode.com
 
 Les tokens restent valides jusqu'a leur suppression ou regeneration manuelle. Nous recommandons de les renouveler regulierement pour des raisons de securite.
 
-### Quelles sont les limites du forfait gratuit ?
+### Quelles sont les limites du quota d'utilisation ?
 
-Chaque utilisateur beneficie d'un quota gratuit. Le montant exact varie en fonction des ressources disponibles sur la plateforme. Consultez votre console pour suivre votre consommation.
+Chaque utilisateur beneficie d'un quota d'utilisation. Le montant exact varie en fonction des ressources disponibles sur la plateforme. Consultez votre console pour suivre votre consommation.
 
 ::: warning Attention
-Une fois le quota gratuit epuise, les requetes seront rejetees. Prevoyez votre utilisation en consequence.
+Une fois le quota epuise, les requetes seront rejetees. Prevoyez votre utilisation en consequence.
 :::
 
 ## Configuration des outils

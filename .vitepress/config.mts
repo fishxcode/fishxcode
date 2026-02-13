@@ -77,7 +77,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/gemini' },
               { text: 'RooCode', link: '/roocode' },
               { text: 'Qwen Code', link: '/qwencode' },
-              { text: 'Droid CLI', link: '/droid' }
+              { text: 'Droid CLI', link: '/droid' },
+              { text: 'OpenCode', link: '/opencode' }
             ]
           },
           {
@@ -100,7 +101,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/gemini' },
               { text: 'RooCode', link: '/roocode' },
               { text: 'Qwen Code', link: '/qwencode' },
-              { text: 'Droid CLI', link: '/droid' }
+              { text: 'Droid CLI', link: '/droid' },
+              { text: 'OpenCode', link: '/opencode' }
             ]
           },
           {
@@ -145,7 +147,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/en/gemini' },
               { text: 'RooCode', link: '/en/roocode' },
               { text: 'Qwen Code', link: '/en/qwencode' },
-              { text: 'Droid CLI', link: '/en/droid' }
+              { text: 'Droid CLI', link: '/en/droid' },
+              { text: 'OpenCode', link: '/en/opencode' }
             ]
           },
           {
@@ -168,7 +171,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/en/gemini' },
               { text: 'RooCode', link: '/en/roocode' },
               { text: 'Qwen Code', link: '/en/qwencode' },
-              { text: 'Droid CLI', link: '/en/droid' }
+              { text: 'Droid CLI', link: '/en/droid' },
+              { text: 'OpenCode', link: '/en/opencode' }
             ]
           },
           {
@@ -213,7 +217,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/fr/gemini' },
               { text: 'RooCode', link: '/fr/roocode' },
               { text: 'Qwen Code', link: '/fr/qwencode' },
-              { text: 'Droid CLI', link: '/fr/droid' }
+              { text: 'Droid CLI', link: '/fr/droid' },
+              { text: 'OpenCode', link: '/fr/opencode' }
             ]
           },
           {
@@ -236,7 +241,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/fr/gemini' },
               { text: 'RooCode', link: '/fr/roocode' },
               { text: 'Qwen Code', link: '/fr/qwencode' },
-              { text: 'Droid CLI', link: '/fr/droid' }
+              { text: 'Droid CLI', link: '/fr/droid' },
+              { text: 'OpenCode', link: '/fr/opencode' }
             ]
           },
           {
@@ -281,7 +287,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/es/gemini' },
               { text: 'RooCode', link: '/es/roocode' },
               { text: 'Qwen Code', link: '/es/qwencode' },
-              { text: 'Droid CLI', link: '/es/droid' }
+              { text: 'Droid CLI', link: '/es/droid' },
+              { text: 'OpenCode', link: '/es/opencode' }
             ]
           },
           {
@@ -304,7 +311,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/es/gemini' },
               { text: 'RooCode', link: '/es/roocode' },
               { text: 'Qwen Code', link: '/es/qwencode' },
-              { text: 'Droid CLI', link: '/es/droid' }
+              { text: 'Droid CLI', link: '/es/droid' },
+              { text: 'OpenCode', link: '/es/opencode' }
             ]
           },
           {
@@ -349,7 +357,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/pt/gemini' },
               { text: 'RooCode', link: '/pt/roocode' },
               { text: 'Qwen Code', link: '/pt/qwencode' },
-              { text: 'Droid CLI', link: '/pt/droid' }
+              { text: 'Droid CLI', link: '/pt/droid' },
+              { text: 'OpenCode', link: '/pt/opencode' }
             ]
           },
           {
@@ -372,7 +381,8 @@ export default defineConfig({
               { text: 'Gemini Cli', link: '/pt/gemini' },
               { text: 'RooCode', link: '/pt/roocode' },
               { text: 'Qwen Code', link: '/pt/qwencode' },
-              { text: 'Droid CLI', link: '/pt/droid' }
+              { text: 'Droid CLI', link: '/pt/droid' },
+              { text: 'OpenCode', link: '/pt/opencode' }
             ]
           },
           {

@@ -12,6 +12,7 @@
 | **RooCode** | Roo Veterinary | VSCode 扩展 |
 | **Qwen Code** | 阿里巴巴 | CLI 终端工具 |
 | **Droid CLI** | Factory AI | CLI 终端工具 |
+| **OpenCode** | OpenCode AI | CLI 终端工具 (TUI) |
 
 ## 平台支持
 
@@ -23,6 +24,7 @@
 | **RooCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Droid CLI** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| **OpenCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ## IDE 集成
 
@@ -34,6 +36,7 @@
 | **RooCode** | - | :white_check_mark: | - |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | :white_check_mark: | - | - |
+| **OpenCode** | :white_check_mark: | - | - |
 
 ## 配置方式
 
@@ -45,6 +48,7 @@
 | **RooCode** | - | - | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | - | JSON | CLI 交互 |
+| **OpenCode** | :white_check_mark: | JSON | TUI 交互 |
 
 ## FishXCode 兼容性
 
@@ -56,6 +60,7 @@
 | **RooCode** | :white_check_mark: 已支持 | 简单 | GUI 界面配置提供商 |
 | **Qwen Code** | :white_check_mark: 已支持 | 简单 | 设置环境变量即可 |
 | **Droid CLI** | :white_check_mark: 已支持 | 中等 | 需编辑 JSON 配置文件 |
+| **OpenCode** | :white_check_mark: 已支持 | 中等 | 需编辑 JSON 配置文件 |
 
 ::: warning Gemini CLI 暂不支持
 Gemini CLI 目前不支持自定义 API 路由，因此无法接入 FishXCode。如需使用 Google 生态，建议选择其他已支持的工具作为替代。
@@ -71,6 +76,7 @@ Gemini CLI 目前不支持自定义 API 路由，因此无法接入 FishXCode。
 | **RooCode** | 纯 VSCode 图形化体验，OpenAI Compatible 协议，零终端门槛 |
 | **Qwen Code** | 阿里通义系列加持，对中文代码场景优化，轻量易用 |
 | **Droid CLI** | 自定义模型灵活，支持超大上下文窗口，专注终端工作流 |
+| **OpenCode** | 开源 TUI 界面，支持 75+ 模型，内置 build/plan 双模式 Agent，GitHub Copilot 集成 |
 
 ## 如何选择
 

@@ -12,6 +12,7 @@ Choose the right AI coding tool for your workflow. Here is a comprehensive compa
 | **RooCode** | Roo Veterinary | VSCode Extension |
 | **Qwen Code** | Alibaba | CLI Terminal Tool |
 | **Droid CLI** | Factory AI | CLI Terminal Tool |
+| **OpenCode** | OpenCode AI | CLI Terminal Tool (TUI) |
 
 ## Platform Support
 
@@ -23,6 +24,7 @@ Choose the right AI coding tool for your workflow. Here is a comprehensive compa
 | **RooCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | **Droid CLI** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| **OpenCode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ## IDE Integration
 
@@ -34,6 +36,7 @@ Choose the right AI coding tool for your workflow. Here is a comprehensive compa
 | **RooCode** | - | :white_check_mark: | - |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | :white_check_mark: | - | - |
+| **OpenCode** | :white_check_mark: | - | - |
 
 ## Configuration Method
 
@@ -45,6 +48,7 @@ Choose the right AI coding tool for your workflow. Here is a comprehensive compa
 | **RooCode** | - | - | :white_check_mark: |
 | **Qwen Code** | :white_check_mark: | - | - |
 | **Droid CLI** | - | JSON | CLI Interactive |
+| **OpenCode** | :white_check_mark: | JSON | TUI Interactive |
 
 ## FishXCode Compatibility
 
@@ -56,6 +60,7 @@ Choose the right AI coding tool for your workflow. Here is a comprehensive compa
 | **RooCode** | :white_check_mark: Supported | Easy | GUI provider configuration |
 | **Qwen Code** | :white_check_mark: Supported | Easy | Set environment variables |
 | **Droid CLI** | :white_check_mark: Supported | Medium | Requires JSON config editing |
+| **OpenCode** | :white_check_mark: Supported | Medium | Requires JSON config editing |
 
 ::: warning Gemini CLI Not Yet Supported
 Gemini CLI does not currently support custom API routing, making it incompatible with FishXCode. If you are looking for an alternative, consider any of the other supported tools listed above.
@@ -71,6 +76,7 @@ Gemini CLI does not currently support custom API routing, making it incompatible
 | **RooCode** | Full VSCode graphical experience, OpenAI Compatible protocol, zero terminal barrier |
 | **Qwen Code** | Backed by Alibaba's Qwen models, optimized for multilingual scenarios, lightweight |
 | **Droid CLI** | Flexible custom model support, extra-large context windows, terminal-focused workflow |
+| **OpenCode** | Open-source TUI interface, 75+ model support, built-in build/plan dual-mode agents, GitHub Copilot integration |
 
 ## How to Choose
 

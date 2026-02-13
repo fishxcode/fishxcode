@@ -16,6 +16,7 @@ Currently supported tools:
 - **RooCode** — AI coding extension for VS Code
 - **Qwen Code** — Alibaba's Qwen-based coding tool
 - **Droid CLI** — Lightweight AI coding CLI
+- **OpenCode** — Open-source AI coding terminal tool
 
 ### How is my data handled?
 
@@ -39,12 +40,12 @@ After signing in, go to the [Token Management page](https://fishxcode.com/consol
 
 Tokens remain valid until you manually delete or regenerate them. We recommend rotating tokens periodically for security.
 
-### What are the free tier limits?
+### What are the usage quota limits?
 
-Every user receives a free quota. The exact amount adjusts dynamically based on platform resources. Check the console for your current usage.
+Every user receives a usage quota. The exact amount adjusts dynamically based on platform resources. Check the console for your current usage.
 
 ::: warning
-Once your free quota is exhausted, requests will be rejected. Plan your usage accordingly.
+Once your quota is exhausted, requests will be rejected. Plan your usage accordingly.
 :::
 
 ## Tool Configuration

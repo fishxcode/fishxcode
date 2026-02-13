@@ -16,6 +16,7 @@ Herramientas disponibles actualmente:
 - **RooCode** — Extension de IA para VS Code
 - **Qwen Code** — Herramienta de programacion basada en Qwen de Alibaba
 - **Droid CLI** — CLI ligero para programacion con IA
+- **OpenCode** — Herramienta terminal de codigo abierto para programacion con IA
 
 ### Como se protegen mis datos?
 
@@ -39,12 +40,12 @@ Despues de iniciar sesion, ve a la [pagina de gestion de tokens](https://fishxco
 
 Los tokens permanecen activos hasta que los elimines o regeneres manualmente. Te recomendamos rotarlos periodicamente por seguridad.
 
-### Cuales son los limites del plan gratuito?
+### Cuales son los limites de la cuota de uso?
 
-Cada usuario recibe una cuota gratuita. La cantidad exacta se ajusta dinamicamente segun los recursos de la plataforma. Consulta tu consola para ver el consumo actual.
+Cada usuario recibe una cuota de uso. La cantidad exacta se ajusta dinamicamente segun los recursos de la plataforma. Consulta tu consola para ver el consumo actual.
 
 ::: warning Aviso
-Cuando se agote tu cuota gratuita, las solicitudes seran rechazadas. Planifica tu uso de forma adecuada.
+Cuando se agote tu cuota, las solicitudes seran rechazadas. Planifica tu uso de forma adecuada.
 :::
 
 ## Configuracion de herramientas
