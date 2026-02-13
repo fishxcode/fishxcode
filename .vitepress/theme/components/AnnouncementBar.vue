@@ -19,15 +19,25 @@ const I18N: Record<string, { text: string; linkText: string }> = {
 const { lang } = useData()
 const t = computed(() => I18N[lang.value] ?? I18N['zh-CN'])
 
+const BAR_HEIGHT = '36px'
+
 const visible = ref(false)
 
+function setLayoutOffset(height: string) {
+  document.documentElement.style.setProperty('--vp-layout-top-height', height)
+}
+
 onMounted(() => {
-  visible.value = !localStorage.getItem(props.storageKey)
+  if (!localStorage.getItem(props.storageKey)) {
+    visible.value = true
+    setLayoutOffset(BAR_HEIGHT)
+  }
 })
 
 function dismiss() {
   visible.value = false
   localStorage.setItem(props.storageKey, '1')
+  setLayoutOffset('0px')
 }
 </script>
 
