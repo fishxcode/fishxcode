@@ -100,7 +100,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/roocode' },
               { text: 'Qwen Code', link: '/qwencode' },
               { text: 'Droid CLI', link: '/droid' },
-              { text: 'OpenCode', link: '/opencode' }
+              { text: 'OpenCode', link: '/opencode' },
+              { text: 'OpenClaw', link: '/openclaw' }
             ]
           },
           {
@@ -124,7 +125,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/roocode' },
               { text: 'Qwen Code', link: '/qwencode' },
               { text: 'Droid CLI', link: '/droid' },
-              { text: 'OpenCode', link: '/opencode' }
+              { text: 'OpenCode', link: '/opencode' },
+              { text: 'OpenClaw', link: '/openclaw' }
             ]
           },
           {
@@ -170,7 +172,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/en/roocode' },
               { text: 'Qwen Code', link: '/en/qwencode' },
               { text: 'Droid CLI', link: '/en/droid' },
-              { text: 'OpenCode', link: '/en/opencode' }
+              { text: 'OpenCode', link: '/en/opencode' },
+              { text: 'OpenClaw', link: '/en/openclaw' }
             ]
           },
           {
@@ -194,7 +197,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/en/roocode' },
               { text: 'Qwen Code', link: '/en/qwencode' },
               { text: 'Droid CLI', link: '/en/droid' },
-              { text: 'OpenCode', link: '/en/opencode' }
+              { text: 'OpenCode', link: '/en/opencode' },
+              { text: 'OpenClaw', link: '/en/openclaw' }
             ]
           },
           {
@@ -240,7 +244,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/fr/roocode' },
               { text: 'Qwen Code', link: '/fr/qwencode' },
               { text: 'Droid CLI', link: '/fr/droid' },
-              { text: 'OpenCode', link: '/fr/opencode' }
+              { text: 'OpenCode', link: '/fr/opencode' },
+              { text: 'OpenClaw', link: '/fr/openclaw' }
             ]
           },
           {
@@ -264,7 +269,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/fr/roocode' },
               { text: 'Qwen Code', link: '/fr/qwencode' },
               { text: 'Droid CLI', link: '/fr/droid' },
-              { text: 'OpenCode', link: '/fr/opencode' }
+              { text: 'OpenCode', link: '/fr/opencode' },
+              { text: 'OpenClaw', link: '/fr/openclaw' }
             ]
           },
           {
@@ -310,7 +316,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/es/roocode' },
               { text: 'Qwen Code', link: '/es/qwencode' },
               { text: 'Droid CLI', link: '/es/droid' },
-              { text: 'OpenCode', link: '/es/opencode' }
+              { text: 'OpenCode', link: '/es/opencode' },
+              { text: 'OpenClaw', link: '/es/openclaw' }
             ]
           },
           {
@@ -334,7 +341,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/es/roocode' },
               { text: 'Qwen Code', link: '/es/qwencode' },
               { text: 'Droid CLI', link: '/es/droid' },
-              { text: 'OpenCode', link: '/es/opencode' }
+              { text: 'OpenCode', link: '/es/opencode' },
+              { text: 'OpenClaw', link: '/es/openclaw' }
             ]
           },
           {
@@ -380,7 +388,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/pt/roocode' },
               { text: 'Qwen Code', link: '/pt/qwencode' },
               { text: 'Droid CLI', link: '/pt/droid' },
-              { text: 'OpenCode', link: '/pt/opencode' }
+              { text: 'OpenCode', link: '/pt/opencode' },
+              { text: 'OpenClaw', link: '/pt/openclaw' }
             ]
           },
           {
@@ -404,7 +413,8 @@ export default withPwa(defineConfig({
               { text: 'RooCode', link: '/pt/roocode' },
               { text: 'Qwen Code', link: '/pt/qwencode' },
               { text: 'Droid CLI', link: '/pt/droid' },
-              { text: 'OpenCode', link: '/pt/opencode' }
+              { text: 'OpenCode', link: '/pt/opencode' },
+              { text: 'OpenClaw', link: '/pt/openclaw' }
             ]
           },
           {
