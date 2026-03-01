@@ -107,13 +107,25 @@ export default withPwa(defineConfig({
           {
             text: '更多',
             items: [
-              { text: '工具对比', link: '/compare' },
-              { text: '支持的模型', link: '/models' },
-              { text: '常见问题', link: '/faq' },
-              { text: '更新日志', link: '/changelog' },
-              { text: '社区公告', link: '/announcement' },
-              { text: '用户协议', link: '/terms' },
-              { text: '隐私政策', link: '/privacy' }
+              {
+                items: [
+                  { text: '工具对比', link: '/compare' },
+                  { text: '支持的模型', link: '/models' },
+                  { text: '常见问题', link: '/faq' },
+                  { text: '更新日志', link: '/changelog' },
+                  { text: '社区公告', link: '/announcement' },
+                  { text: '用户协议', link: '/terms' },
+                  { text: '隐私政策', link: '/privacy' }
+                ]
+              },
+              {
+                text: '常用链接',
+                items: [
+                  { text: '控制台', link: 'https://fishxcode.com/console' },
+                  { text: '服务状态', link: 'https://status.fishxcode.com' },
+                  { text: '额度查询', link: 'https://api-key-tool.fishxcode.com' }
+                ]
+              }
             ]
           },
           { text: '立即注册', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -185,13 +197,25 @@ export default withPwa(defineConfig({
           {
             text: 'More',
             items: [
-              { text: 'Tool Comparison', link: '/en/compare' },
-              { text: 'Supported Models', link: '/en/models' },
-              { text: 'FAQ', link: '/en/faq' },
-              { text: 'Changelog', link: '/en/changelog' },
-              { text: 'Announcement', link: '/en/announcement' },
-              { text: 'Terms', link: '/en/terms' },
-              { text: 'Privacy', link: '/en/privacy' }
+              {
+                items: [
+                  { text: 'Tool Comparison', link: '/en/compare' },
+                  { text: 'Supported Models', link: '/en/models' },
+                  { text: 'FAQ', link: '/en/faq' },
+                  { text: 'Changelog', link: '/en/changelog' },
+                  { text: 'Announcement', link: '/en/announcement' },
+                  { text: 'Terms', link: '/en/terms' },
+                  { text: 'Privacy', link: '/en/privacy' }
+                ]
+              },
+              {
+                text: 'Quick Links',
+                items: [
+                  { text: 'Console', link: 'https://fishxcode.com/console' },
+                  { text: 'Service Status', link: 'https://status.fishxcode.com' },
+                  { text: 'Credit Balance', link: 'https://api-key-tool.fishxcode.com' }
+                ]
+              }
             ]
           },
           { text: 'Register Now', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -263,13 +287,25 @@ export default withPwa(defineConfig({
           {
             text: 'Plus',
             items: [
-              { text: 'Comparaison des outils', link: '/fr/compare' },
-              { text: 'Modèles supportés', link: '/fr/models' },
-              { text: 'FAQ', link: '/fr/faq' },
-              { text: 'Journal des modifications', link: '/fr/changelog' },
-              { text: 'Annonce', link: '/fr/announcement' },
-              { text: 'Conditions', link: '/fr/terms' },
-              { text: 'Confidentialité', link: '/fr/privacy' }
+              {
+                items: [
+                  { text: 'Comparaison des outils', link: '/fr/compare' },
+                  { text: 'Modèles supportés', link: '/fr/models' },
+                  { text: 'FAQ', link: '/fr/faq' },
+                  { text: 'Journal des modifications', link: '/fr/changelog' },
+                  { text: 'Annonce', link: '/fr/announcement' },
+                  { text: 'Conditions', link: '/fr/terms' },
+                  { text: 'Confidentialité', link: '/fr/privacy' }
+                ]
+              },
+              {
+                text: 'Liens utiles',
+                items: [
+                  { text: 'Console', link: 'https://fishxcode.com/console' },
+                  { text: 'État du service', link: 'https://status.fishxcode.com' },
+                  { text: 'Vérifier le solde', link: 'https://api-key-tool.fishxcode.com' }
+                ]
+              }
             ]
           },
           { text: "S'inscrire", link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -341,13 +377,25 @@ export default withPwa(defineConfig({
           {
             text: 'Más',
             items: [
-              { text: 'Comparación de herramientas', link: '/es/compare' },
-              { text: 'Modelos soportados', link: '/es/models' },
-              { text: 'Preguntas frecuentes', link: '/es/faq' },
-              { text: 'Registro de cambios', link: '/es/changelog' },
-              { text: 'Anuncio', link: '/es/announcement' },
-              { text: 'Términos', link: '/es/terms' },
-              { text: 'Privacidad', link: '/es/privacy' }
+              {
+                items: [
+                  { text: 'Comparación de herramientas', link: '/es/compare' },
+                  { text: 'Modelos soportados', link: '/es/models' },
+                  { text: 'Preguntas frecuentes', link: '/es/faq' },
+                  { text: 'Registro de cambios', link: '/es/changelog' },
+                  { text: 'Anuncio', link: '/es/announcement' },
+                  { text: 'Términos', link: '/es/terms' },
+                  { text: 'Privacidad', link: '/es/privacy' }
+                ]
+              },
+              {
+                text: 'Enlaces útiles',
+                items: [
+                  { text: 'Consola', link: 'https://fishxcode.com/console' },
+                  { text: 'Estado del servicio', link: 'https://status.fishxcode.com' },
+                  { text: 'Consultar saldo', link: 'https://api-key-tool.fishxcode.com' }
+                ]
+              }
             ]
           },
           { text: 'Registrarse', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -419,13 +467,25 @@ export default withPwa(defineConfig({
           {
             text: 'Mais',
             items: [
-              { text: 'Comparação de ferramentas', link: '/pt/compare' },
-              { text: 'Modelos suportados', link: '/pt/models' },
-              { text: 'Perguntas frequentes', link: '/pt/faq' },
-              { text: 'Registro de alterações', link: '/pt/changelog' },
-              { text: 'Comunicado', link: '/pt/announcement' },
-              { text: 'Termos', link: '/pt/terms' },
-              { text: 'Privacidade', link: '/pt/privacy' }
+              {
+                items: [
+                  { text: 'Comparação de ferramentas', link: '/pt/compare' },
+                  { text: 'Modelos suportados', link: '/pt/models' },
+                  { text: 'Perguntas frequentes', link: '/pt/faq' },
+                  { text: 'Registro de alterações', link: '/pt/changelog' },
+                  { text: 'Comunicado', link: '/pt/announcement' },
+                  { text: 'Termos', link: '/pt/terms' },
+                  { text: 'Privacidade', link: '/pt/privacy' }
+                ]
+              },
+              {
+                text: 'Links úteis',
+                items: [
+                  { text: 'Console', link: 'https://fishxcode.com/console' },
+                  { text: 'Status do serviço', link: 'https://status.fishxcode.com' },
+                  { text: 'Verificar saldo', link: 'https://api-key-tool.fishxcode.com' }
+                ]
+              }
             ]
           },
           { text: 'Registrar', link: 'https://fishxcode.com/register?aff=9CTW' }
