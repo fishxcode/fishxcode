@@ -110,7 +110,10 @@ export default withPwa(defineConfig({
               { text: '工具对比', link: '/compare' },
               { text: '支持的模型', link: '/models' },
               { text: '常见问题', link: '/faq' },
-              { text: '更新日志', link: '/changelog' }
+              { text: '更新日志', link: '/changelog' },
+              { text: '社区公告', link: '/announcement' },
+              { text: '用户协议', link: '/terms' },
+              { text: '隐私政策', link: '/privacy' }
             ]
           },
           { text: '立即注册', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -135,7 +138,10 @@ export default withPwa(defineConfig({
               { text: '工具对比', link: '/compare' },
               { text: '支持的模型', link: '/models' },
               { text: '常见问题', link: '/faq' },
-              { text: '更新日志', link: '/changelog' }
+              { text: '更新日志', link: '/changelog' },
+              { text: '社区公告', link: '/announcement' },
+              { text: '用户协议', link: '/terms' },
+              { text: '隐私政策', link: '/privacy' }
             ]
           }
         ],
@@ -182,7 +188,10 @@ export default withPwa(defineConfig({
               { text: 'Tool Comparison', link: '/en/compare' },
               { text: 'Supported Models', link: '/en/models' },
               { text: 'FAQ', link: '/en/faq' },
-              { text: 'Changelog', link: '/en/changelog' }
+              { text: 'Changelog', link: '/en/changelog' },
+              { text: 'Announcement', link: '/en/announcement' },
+              { text: 'Terms', link: '/en/terms' },
+              { text: 'Privacy', link: '/en/privacy' }
             ]
           },
           { text: 'Register Now', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -207,7 +216,10 @@ export default withPwa(defineConfig({
               { text: 'Tool Comparison', link: '/en/compare' },
               { text: 'Supported Models', link: '/en/models' },
               { text: 'FAQ', link: '/en/faq' },
-              { text: 'Changelog', link: '/en/changelog' }
+              { text: 'Changelog', link: '/en/changelog' },
+              { text: 'Announcement', link: '/en/announcement' },
+              { text: 'Terms', link: '/en/terms' },
+              { text: 'Privacy', link: '/en/privacy' }
             ]
           }
         ],
@@ -254,7 +266,10 @@ export default withPwa(defineConfig({
               { text: 'Comparaison des outils', link: '/fr/compare' },
               { text: 'Modèles supportés', link: '/fr/models' },
               { text: 'FAQ', link: '/fr/faq' },
-              { text: 'Journal des modifications', link: '/fr/changelog' }
+              { text: 'Journal des modifications', link: '/fr/changelog' },
+              { text: 'Annonce', link: '/fr/announcement' },
+              { text: 'Conditions', link: '/fr/terms' },
+              { text: 'Confidentialité', link: '/fr/privacy' }
             ]
           },
           { text: "S'inscrire", link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -279,7 +294,10 @@ export default withPwa(defineConfig({
               { text: 'Comparaison des outils', link: '/fr/compare' },
               { text: 'Modèles supportés', link: '/fr/models' },
               { text: 'FAQ', link: '/fr/faq' },
-              { text: 'Journal des modifications', link: '/fr/changelog' }
+              { text: 'Journal des modifications', link: '/fr/changelog' },
+              { text: 'Annonce', link: '/fr/announcement' },
+              { text: 'Conditions', link: '/fr/terms' },
+              { text: 'Confidentialité', link: '/fr/privacy' }
             ]
           }
         ],
@@ -326,7 +344,10 @@ export default withPwa(defineConfig({
               { text: 'Comparación de herramientas', link: '/es/compare' },
               { text: 'Modelos soportados', link: '/es/models' },
               { text: 'Preguntas frecuentes', link: '/es/faq' },
-              { text: 'Registro de cambios', link: '/es/changelog' }
+              { text: 'Registro de cambios', link: '/es/changelog' },
+              { text: 'Anuncio', link: '/es/announcement' },
+              { text: 'Términos', link: '/es/terms' },
+              { text: 'Privacidad', link: '/es/privacy' }
             ]
           },
           { text: 'Registrarse', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -351,7 +372,10 @@ export default withPwa(defineConfig({
               { text: 'Comparación de herramientas', link: '/es/compare' },
               { text: 'Modelos soportados', link: '/es/models' },
               { text: 'Preguntas frecuentes', link: '/es/faq' },
-              { text: 'Registro de cambios', link: '/es/changelog' }
+              { text: 'Registro de cambios', link: '/es/changelog' },
+              { text: 'Anuncio', link: '/es/announcement' },
+              { text: 'Términos', link: '/es/terms' },
+              { text: 'Privacidad', link: '/es/privacy' }
             ]
           }
         ],
@@ -398,7 +422,10 @@ export default withPwa(defineConfig({
               { text: 'Comparação de ferramentas', link: '/pt/compare' },
               { text: 'Modelos suportados', link: '/pt/models' },
               { text: 'Perguntas frequentes', link: '/pt/faq' },
-              { text: 'Registro de alterações', link: '/pt/changelog' }
+              { text: 'Registro de alterações', link: '/pt/changelog' },
+              { text: 'Comunicado', link: '/pt/announcement' },
+              { text: 'Termos', link: '/pt/terms' },
+              { text: 'Privacidade', link: '/pt/privacy' }
             ]
           },
           { text: 'Registrar', link: 'https://fishxcode.com/register?aff=9CTW' }
@@ -423,7 +450,10 @@ export default withPwa(defineConfig({
               { text: 'Comparação de ferramentas', link: '/pt/compare' },
               { text: 'Modelos suportados', link: '/pt/models' },
               { text: 'Perguntas frequentes', link: '/pt/faq' },
-              { text: 'Registro de alterações', link: '/pt/changelog' }
+              { text: 'Registro de alterações', link: '/pt/changelog' },
+              { text: 'Comunicado', link: '/pt/announcement' },
+              { text: 'Termos', link: '/pt/terms' },
+              { text: 'Privacidade', link: '/pt/privacy' }
             ]
           }
         ],
