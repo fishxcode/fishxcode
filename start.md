@@ -207,13 +207,47 @@ npm install -g @anthropic-ai/claude-code
 
 ---
 
-## 七、IDE 集成（IntelliJ IDEA）
+## 七、IDE 集成
+
+### IntelliJ IDEA
 
 **安装路径**：IDEA → 文件 → 设置 → 插件 → Marketplace → 搜索 `claude code` → 找到 **Claude Code Terminal** → 安装。
 
 ::: info
 若在插件市场搜索不到，说明当前 IDEA 版本过低，需升级至最新版本。
 :::
+
+### VSCode
+
+按 `Ctrl + Shift + X` 打开扩展面板，搜索 `claude code`，找到 **Claude Code for VSCode** 安装。
+
+![搜索并安装 Claude Code 插件](https://i-blog.csdnimg.cn/direct/93c107a4bf53488b806c24bc44f9a3b9.png)
+
+安装完成后，插件提供三种接入方式：
+
+![Claude Code 插件接入方式](https://i-blog.csdnimg.cn/direct/503de42f57b14cc089db263a64a1d25d.png)
+
+推荐通过 `settings.json` 配置接入 FishXCode。点击插件右下角**齿轮图标** → **在 settings.json 中编辑**：
+
+![打开 settings.json 编辑](https://i-blog.csdnimg.cn/direct/819ee3f7a28e4928bd3445e36fcf406e.png)
+
+在 VSCode 的 `settings.json` 中添加：
+
+```json
+{
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.environmentVariables": [
+    { "name": "ANTHROPIC_AUTH_TOKEN", "value": "替换为您的 API Key" },
+    { "name": "ANTHROPIC_BASE_URL", "value": "https://fishxcode.com/" }
+  ]
+}
+```
+
+![settings.json 配置示例](https://i-blog.csdnimg.cn/direct/4dbbcf0ff8354976a4c0afbea9a6739f.png)
+
+保存后**退出并重新打开 VSCode**，插件即可正常连接 FishXCode。
+
+![在 VSCode 中使用 Claude Code](https://i-blog.csdnimg.cn/direct/d33dc0be8aaa4077ac7d11f6c37a7096.gif)
 
 ---
 
