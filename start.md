@@ -211,17 +211,13 @@ npm install -g @anthropic-ai/claude-code
 
 ### IntelliJ IDEA
 
-操作路径：文件 → 设置 → 插件 → Marketplace → 搜索 `claude code`：
+操作路径：文件 → 设置 → 插件 → Marketplace → 搜索 `claude code`，找到 **Claude  Code Terminal** 并安装：
 
-![搜索 claude code 插件](/img/start/idea-01-search.png)
-
-找到 **Claude  Code Terminal** 并安装：
-
-![安装 Claude  Code Terminal](/img/start/idea-02-install.png)
+![安装 Claude  Code Terminal](/img/start/idea-01-install.png)
 
 安装完成后重启 IDEA，验证插件已加载：
 
-![验证插件已加载](/img/start/idea-03-verify.png)
+![验证插件已加载](/img/start/idea-02-verify.png)
 
 ::: info
 若在插件市场搜索不到，说明当前 IDEA 版本过低，需升级至最新版本。
