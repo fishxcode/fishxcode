@@ -133,6 +133,7 @@ export default withPwa(defineConfig({
           {
             text: '快速开始',
             items: [
+              { text: '账户注册', link: '/account' },
               { text: 'Claude Code', link: '/start' },
               { text: 'OpenAI Codex', link: '/codex' },
               { text: 'Gemini Cli', link: '/gemini' },
@@ -222,6 +223,7 @@ export default withPwa(defineConfig({
           {
             text: 'Get Started',
             items: [
+              { text: 'Account Setup', link: '/en/account' },
               { text: 'Claude Code', link: '/en/start' },
               { text: 'OpenAI Codex', link: '/en/codex' },
               { text: 'Gemini Cli', link: '/en/gemini' },
@@ -311,6 +313,7 @@ export default withPwa(defineConfig({
           {
             text: 'Démarrage rapide',
             items: [
+              { text: 'Création de compte', link: '/fr/account' },
               { text: 'Claude Code', link: '/fr/start' },
               { text: 'OpenAI Codex', link: '/fr/codex' },
               { text: 'Gemini Cli', link: '/fr/gemini' },
@@ -400,6 +403,7 @@ export default withPwa(defineConfig({
           {
             text: 'Comenzar',
             items: [
+              { text: 'Registro de cuenta', link: '/es/account' },
               { text: 'Claude Code', link: '/es/start' },
               { text: 'OpenAI Codex', link: '/es/codex' },
               { text: 'Gemini Cli', link: '/es/gemini' },
@@ -489,6 +493,7 @@ export default withPwa(defineConfig({
           {
             text: 'Começar',
             items: [
+              { text: 'Configuração de conta', link: '/pt/account' },
               { text: 'Claude Code', link: '/pt/start' },
               { text: 'OpenAI Codex', link: '/pt/codex' },
               { text: 'Gemini Cli', link: '/pt/gemini' },

@@ -1,62 +1,8 @@
 # 在 Claude  Code 中使用 FishXCode
 
-## 一、获取 API Key
+> 首次使用？请先完成 [账户注册与充值](/account)。
 
-### 1. 注册账号
-
-访问 [fishxcode.com](https://fishxcode.com/register?aff=9CTW)，点击**注册**：
-
-![FishXCode 首页](/img/start/api-01-home.png)
-
-选择注册方式（GitHub、LinuxDO 或用户名注册）：
-
-![注册方式选择](/img/start/api-02-register.png)
-
-填写用户名、密码和确认密码完成注册：
-
-![填写注册信息](/img/start/api-03-register-form.png)
-
-### 2. 登录
-
-注册完成后使用用户名和密码登录：
-
-![登录页面](/img/start/api-04-login.png)
-
-登录后进入控制台：
-
-![控制台首页](/img/start/api-05-console.png)
-
-### 3. 创建令牌
-
-进入**控制台 → 令牌管理 → 添加令牌**，填写表单：
-
-![添加令牌](/img/start/api-06-token-create.png)
-
-- **令牌分组**建议选择 **官渠**，该分组包含 `claude-opus-4-5-20251101`、`claude-haiku-4-5-20251001`、`claude-opus-4-6`、`claude-sonnet-4-5-20250929`、`claude-sonnet-4-6` 等模型，会根据任务复杂度自动选择，无需手动切换。
-
-创建完成后在令牌列表点击**复制**按钮获取 API Key（格式为 `sk-xxx`）：
-
-![复制令牌](/img/start/api-07-token-copy.png)
-
-### 4. 充值
-
-进入**控制台 → 钱包管理**，支持支付宝、微信或兑换码：
-
-![充值页面](/img/start/api-08-wallet.png)
-
-| 方式 | 操作路径 |
-|---|---|
-| 支付宝 | 输入/选择金额 → 支付宝 |
-| 微信 | 输入/选择金额 → 微信 |
-| 兑换码 | 兑换码区域输入 → 点击兑换额度 |
-
-::: tip 倍率说明
-分组名称中的 `0.5x倍率` 表示消费倍率，数值越小获得更多 Token，如 `0.5x` 即 1 元可使用官方 1000 万 Token（官方原价 500 万）。
-:::
-
----
-
-## 二、环境准备
+## 一、环境准备
 
 ### 安装 Node.js
 
@@ -91,7 +37,7 @@ Claude  Code 依赖 bash 运行环境，Windows 用户需安装 Git Bash：
 
 ---
 
-## 三、安装 Claude  Code
+## 二、安装 Claude  Code
 
 ::: code-group
 
@@ -117,7 +63,7 @@ claude --version
 
 ---
 
-## 四、配置 FishXCode
+## 三、配置 FishXCode
 
 ### 方式一：settings.json（推荐）
 
@@ -192,7 +138,7 @@ setx ANTHROPIC_BASE_URL "https://fishxcode.com/"
 
 ---
 
-## 五、启动使用
+## 四、启动使用
 
 ```bash
 cd my-project
@@ -201,7 +147,7 @@ claude
 
 ---
 
-## 六、模型切换
+## 五、模型切换
 
 在 Claude  Code 对话界面中输入 `/model` 即可切换模型：
 
@@ -236,7 +182,7 @@ npm install -g @anthropic-ai/claude-code
 
 ---
 
-## 七、IDE 集成
+## 六、IDE 集成
 
 ### IntelliJ IDEA
 
@@ -254,13 +200,13 @@ npm install -g @anthropic-ai/claude-code
 
 ### VSCode
 
-按 `Ctrl + Shift + X` 打开扩展面板，搜索 `claude code`，找到 **Claude Code for VSCode** 安装。
+按 `Ctrl + Shift + X` 打开扩展面板，搜索 `claude code`，找到 **Claude  Code for VSCode** 安装。
 
-![搜索并安装 Claude Code 插件](/img/start/vscode-01-install.png)
+![搜索并安装 Claude  Code 插件](/img/start/vscode-01-install.png)
 
 安装完成后，插件提供三种接入方式：
 
-![Claude Code 插件接入方式](/img/start/vscode-02-login.png)
+![Claude  Code 插件接入方式](/img/start/vscode-02-login.png)
 
 推荐通过 `settings.json` 配置接入 FishXCode。点击插件右下角**齿轮图标** → **在 settings.json 中编辑**：
 
@@ -282,11 +228,11 @@ npm install -g @anthropic-ai/claude-code
 
 保存后**退出并重新打开 VSCode**，插件即可正常连接 FishXCode。
 
-![在 VSCode 中使用 Claude Code](/img/start/vscode-05-demo.gif)
+![在 VSCode 中使用 Claude  Code](/img/start/vscode-05-demo.gif)
 
 ---
 
-## 八、常见问题
+## 七、常见问题
 
 ### 出现 403 错误
 
