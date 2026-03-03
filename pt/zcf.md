@@ -1,14 +1,37 @@
 # Configuração rápida com ZCF
 
-[ZCF](https://zcf.ufomiao.com) é uma ferramenta de configuração zero para Claude  Code. Um único comando gerencia a configuração da API, importação de workflows e integração de serviços MCP.
+[ZCF](https://github.com/UfoMiao/zcf) é uma ferramenta de configuração zero para Claude  Code / Codex. Um único comando `zcf init` gerencia a configuração da API, importação de workflows e integração de serviços MCP.
 
-## 1. Conexão rápida
+> Sem conta? Conclua primeiro a [Configuração de conta](/pt/account) para obter sua API Key.
 
-```bash
+## Conexão rápida
+
+::: code-group
+
+```bash [Um comando]
 npx zcf i -s -t api_key -k "sua-chave-api" -u "https://fishxcode.com/"
 ```
 
-Substitua `sua-chave-api` pelo token `sk-xxx` obtido no [Console FishXCode](https://fishxcode.com/console/token).
+```bash [Init completa (recomendado)]
+npx zcf i -s \
+  -t api_key \
+  -k "sua-chave-api" \
+  -u "https://fishxcode.com/" \
+  -g en \
+  --workflows all \
+  --mcp-services context7,open-websearch \
+  --output-styles engineer-professional
+```
+
+```bash [Interativo (primeira vez)]
+npx zcf init
+```
+
+:::
+
+::: warning
+Substitua `sua-chave-api` pelo token `sk-xxx` do seu [Console FishXCode](https://fishxcode.com/console/token).
+:::
 
 Isso escreve automaticamente em `~/.claude/settings.json`:
 
@@ -21,69 +44,81 @@ Isso escreve automaticamente em `~/.claude/settings.json`:
 }
 ```
 
-### Fixar um modelo específico (opcional)
+---
 
-```bash
-npx zcf i -s -t api_key -k "sk-xxx" -u "https://fishxcode.com/" \
-  --api-model "claude-sonnet-4-5-20250929" \
-  --api-fast-model "claude-haiku-4-5-20251001"
-```
+## Parâmetros
+
+### Configuração API
+
+| Parâmetro | Descrição |
+|---|---|
+| `-t api_key` | Modo API Key |
+| `-k "sk-xxx"` | Sua API Key |
+| `-u "https://fishxcode.com/"` | URL base do FishXCode |
+| `-M "claude-sonnet-4-5-20250929"` | Modelo principal |
+| `-H "claude-haiku-4-5-20251001"` | Modelo rápido |
+
+### Workflows
+
+Disponíveis: `commonTools` / `sixStepsWorkflow` / `featPlanUx` / `gitWorkflow` / `bmadWorkflow` / `all` / `skip`
+
+### Serviços MCP
+
+Disponíveis: `context7` / `open-websearch` / `spec-workflow` / `mcp-deepwiki` / `Playwright` / `exa` / `serena` / `all` / `skip`
+
+### Outras opções
+
+| Parâmetro | Descrição |
+|---|---|
+| `-s` | Modo não-interativo |
+| `-r backup` | Estratégia: `backup` / `merge` / `docs-only` / `skip` |
+| `-x false` | Não instalar CCometixLine |
 
 ---
 
-## 2. Inicialização completa (Recomendado)
-
-Configure API, workflows e serviços MCP de uma vez:
-
-```bash
-npx zcf i -s -t api_key -k "sk-xxx" -u "https://fishxcode.com/" \
-  --workflows all \
-  --mcp-services context7,open-websearch \
-  --output-styles engineer-professional
-```
-
-Estrutura `~/.claude/` resultante:
-
-```
-~/.claude/
-├── settings.json          # API, MCP, permissões
-├── CLAUDE.md              # Prompt de sistema global
-├── commands/zcf/          # Comandos de workflow
-└── agents/zcf/            # Agentes de workflow
-```
-
----
-
-## 3. Comandos de workflow
-
-Após a instalação, use no Claude  Code:
+## Comandos de workflow
 
 | Comando | Descrição |
 |---|---|
-| `/zcf:workflow` | Workflow de seis fases (Pesquisa → Ideia → Plano → Execução → Otimização → Revisão) |
-| `/zcf:feat` | Desenvolvimento de funcionalidades com planejamento e design UI/UX |
-| `/zcf:git-commit` | Commit Git automatizado |
-| `/zcf:git-rollback` | Rollback Git |
+| `/zcf:workflow` | Workflow de seis fases |
+| `/zcf:feat` | Desenvolvimento de funcionalidades com UI/UX |
+| `/zcf:git-commit` | Geração automática de commits |
+| `/zcf:git-rollback` | Rollback interativo |
+| `/zcf:git-worktree` | Gerenciamento de Git Worktrees |
 | `/zcf:bmad-init` | Workflow ágil empresarial |
 
 ---
 
-## 4. Serviços MCP
+## Serviços MCP
 
-| Serviço | Descrição |
-|---|---|
-| `context7` | Recuperação de contexto e documentação de bibliotecas |
-| `open-websearch` | Pesquisa DuckDuckGo/Bing/Brave |
-| `spec-workflow` | MCP de workflow Spec |
-| `Playwright` | Automação de navegador |
+| Serviço | Descrição | Key necessária |
+|---|---|---|
+| `context7` | Docs e exemplos de bibliotecas atualizados | Não |
+| `open-websearch` | Pesquisa DuckDuckGo/Bing/Brave | Não |
+| `spec-workflow` | Workflow Requisitos → Design → Implementação | Não |
+| `mcp-deepwiki` | Documentação de repositórios GitHub | Não |
+| `Playwright` | Automação de navegador | Não |
+| `exa` | Pesquisa semântica Exa AI | Sim (`EXA_API_KEY`) |
+| `serena` | Assistente IDE, recuperação semântica de código | Não |
 
-```bash
-npx zcf i -s --mcp-services context7,open-websearch
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context-labs/context7"]
+    }
+  }
+}
 ```
+
+::: tip Usuários Windows
+O ZCF corrige automaticamente os formatos de caminhos do Windows. Se os serviços MCP falharem, execute `npx zcf` → selecione `4. Configurar MCP`.
+:::
 
 ---
 
-## 5. Atualização
+## Atualização
 
 ```bash
 npx zcf update
@@ -93,10 +128,12 @@ npx zcf update
 
 ## Perguntas frequentes
 
-### Meu settings.json existente será sobrescrito?
+### Meu settings.json será sobrescrito?
 
-O ZCF faz backup automático em `~/.claude/backup/` antes de qualquer alteração, e oferece quatro estratégias: backup e sobrescrever / mesclagem inteligente / apenas documentos / ignorar.
+O ZCF faz backup em `~/.claude/backup/` antes de qualquer alteração: `backup` / `merge` / `docs-only` / `skip`.
 
-### Como voltar à configuração manual?
+### Node.js >= 18 necessário
 
-O `settings.json` gerado está em formato padrão — edite diretamente. Ver [Configuração Claude  Code](/pt/start).
+```bash
+node --version
+```
