@@ -5,6 +5,45 @@
   ],
   "headers": [
     {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/workbox-(.*).js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400" },
+        { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(?:woff|woff2|ttf|otf|eot)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/img/(.*)\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=86400" }
+      ]
+    },
+    {
       "source": "/feed.(xml|atom)",
       "headers": [
         { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
@@ -24,41 +63,27 @@
       ]
     },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/img/(.*)\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=86400" }
-      ]
-    },
-    {
-      "source": "/img/(.*)\\.(?:mp4|webm|ogg|mov)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400" },
-        { "key": "Accept-Ranges", "value": "bytes" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.(?:woff|woff2|ttf|otf|eot)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.(?:js|css)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
       "source": "/(.*)\\.html",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/start",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "<https://s3.hi168.com>; rel=preconnect, <https://s3.hi168.com>; rel=dns-prefetch"
+        }
+      ]
+    },
+    {
+      "source": "/:locale(en|fr|es|pt)/start",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "<https://s3.hi168.com>; rel=preconnect, <https://s3.hi168.com>; rel=dns-prefetch"
+        }
       ]
     },
     {
