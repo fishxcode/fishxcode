@@ -26,7 +26,7 @@ onMounted(async () => {
     autoplay: false,
     pip: true,
     autoSize: false,
-    autoMini: true,
+    autoMini: false,
     screenshot: true,
     setting: true,
     loop: false,
@@ -39,7 +39,7 @@ onMounted(async () => {
     mutex: true,
     backdrop: true,
     playsInline: true,
-    autoPlayback: true,
+    autoPlayback: false,
     theme: 'var(--vp-c-brand-1, #646cff)',
   })
 })
@@ -63,6 +63,8 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--vp-c-divider);
+  isolation: isolate;
+  position: relative;
 }
 
 .video-player-container {
