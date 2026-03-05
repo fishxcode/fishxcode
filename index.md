@@ -10,10 +10,10 @@ hero:
     alt: FishXCode Logo
   actions:
     - theme: brand
-      text: 开始使用
-      link: /start
+      text: 立即注册
+      link: https://fishxcode.com/register?aff=9CTW
     - theme: alt
-      text: 在 Claude 中使用
+      text: 使用文档
       link: /start
 
 features:

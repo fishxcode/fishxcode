@@ -10,10 +10,10 @@ hero:
     alt: FishXCode Logo
   actions:
     - theme: brand
-      text: Get Started
-      link: /en/start
+      text: Register Now
+      link: https://fishxcode.com/register?aff=9CTW
     - theme: alt
-      text: Use with Claude
+      text: Documentation
       link: /en/start
 
 features:
