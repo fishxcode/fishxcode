@@ -2,6 +2,10 @@
 
 > New here? Complete [Account Setup](/en/account) first.
 
+## Video Tutorial
+
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/fishxcode_claude.mp4" />
+
 ## 1. Environment Setup
 
 ### Install Node.js

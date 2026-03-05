@@ -2,6 +2,10 @@
 
 > Primeira vez? Primeiro complete a [Configuração de conta](/pt/account).
 
+## Tutorial em vídeo
+
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/fishxcode_claude.mp4" />
+
 ## 1. Preparação do ambiente
 
 ### Instalar Node.js

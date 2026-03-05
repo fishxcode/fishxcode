@@ -2,6 +2,10 @@
 
 > 首次使用？请先完成 [账户注册与充值](/account)。
 
+## 视频教程
+
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/fishxcode_claude.mp4" />
+
 ## 一、环境准备
 
 ### 安装 Node.js

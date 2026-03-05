@@ -2,6 +2,10 @@
 
 > Première utilisation ? Commencez par [créer votre compte](/fr/account).
 
+## Tutoriel vidéo
+
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/fishxcode_claude.mp4" />
+
 ## 1. Préparation de l'environnement
 
 ### Installer Node.js

@@ -10,6 +10,7 @@ import AnnouncementBar from './components/AnnouncementBar.vue'
 import ModelCards from './components/ModelCards.vue'
 import ToolWizard from './components/ToolWizard.vue'
 import Timeline from './components/Timeline.vue'
+import VideoPlayer from './components/VideoPlayer.vue'
 import './style.css'
 import './dark-mode.css'
 import 'virtual:group-icons.css'
@@ -35,5 +36,6 @@ export default {
     app.component('ModelCards', ModelCards)
     app.component('ToolWizard', ToolWizard)
     app.component('Timeline', Timeline)
+    app.component('VideoPlayer', VideoPlayer)
   }
 } satisfies Theme
