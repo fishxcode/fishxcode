@@ -1,53 +1,8 @@
-# 使用 ZCF 接入 FishXCode
+#  ZCF 教程
 
 [ZCF](https://github.com/UfoMiao/zcf) 是 Claude  Code / Codex 的零配置增强工具，`zcf init` 一条命令完成 API 配置、工作流导入、MCP 服务集成等全部初始化。
 
 > 没有账号？先完成 [账户注册](/account) 获取 API Key。
-
-## 快速接入
-
-::: code-group
-
-```bash [推荐写法（-p custom）]
-npx zcf i -s -p custom -k "你的API Key" -u "https://fishxcode.com/"
-```
-
-```bash [等价写法（-t api_key）]
-npx zcf i -s -t api_key -k "你的API Key" -u "https://fishxcode.com/"
-```
-
-```bash [完整初始化]
-npx zcf i -s \
-  -p custom \
-  -k "你的API Key" \
-  -u "https://fishxcode.com/" \
-  -g zh-CN \
-  --workflows all \
-  --mcp-services context7,open-websearch \
-  --output-styles engineer-professional
-```
-
-```bash [交互式（首次使用）]
-npx zcf init
-# ZCF 会逐步引导选择 API 类型、MCP 服务、工作流等
-```
-
-:::
-
-::: warning
-将 `你的API Key` 替换为 [FishXCode 控制台](https://fishxcode.com/console/token) 中的 `sk-xxx` Token。
-:::
-
-执行后自动写入 `~/.claude/settings.json`：
-
-```json
-{
-  "env": {
-    "ANTHROPIC_AUTH_TOKEN": "sk-xxx",
-    "ANTHROPIC_BASE_URL": "https://fishxcode.com/"
-  }
-}
-```
 
 ---
 
