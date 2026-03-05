@@ -1,34 +1,62 @@
 /**
- * Dark Mode Enhancements
- * 基于 VitePress 默认主题的深色模式增强样式
+ * FishXCode Dark Mode — Soft Pink & Gold
+ * 深色模式：以深暖棕为底，金色为主品牌，粉色为点缀
  * -------------------------------------------------------------------------- */
 
-/* --- 品牌色微调 ---------------------------------------------------------- */
+/* =========================================================================
+ * 深色模式品牌色令牌
+ * ========================================================================= */
+
 .dark {
-  --vp-c-brand-1: #7c8aff;
-  --vp-c-brand-2: #6975f0;
-  --vp-c-brand-3: #5b65e6;
-  --vp-c-brand-soft: rgba(100, 108, 255, 0.16);
+  /* 页面底色：深暖棕，比冷黑更具信赖感 */
+  --vp-c-bg: #1c1814;
+  --vp-c-bg-soft: #231f1a;
+  --vp-c-bg-mute: #2a251f;
+
+  /* 品牌色：提亮金，确保深底对比度 */
+  --vp-c-brand-1: #d4a84a;
+  --vp-c-brand-2: #c09038;
+  --vp-c-brand-3: #ab7c2c;
+  --vp-c-brand-soft: rgba(196, 148, 56, 0.16);
+
+  /* 自定义令牌 */
+  --fishx-gold-1: #d4a84a;
+  --fishx-gold-2: #c09038;
+  --fishx-gold-3: #ab7c2c;
+  --fishx-gold-soft: rgba(196, 148, 56, 0.16);
+
+  --fishx-pink-1: #d47898;
+  --fishx-pink-2: #e890aa;
+  --fishx-pink-3: #f0a8bc;
+  --fishx-pink-soft: rgba(232, 144, 170, 0.12);
+
+  --fishx-warm-border: rgba(196, 148, 56, 0.2);
 }
 
-/* --- 代码块 -------------------------------------------------------------- */
+/* =========================================================================
+ * 代码块
+ * ========================================================================= */
+
 .dark .vp-doc div[class*='language-'] {
-  background: rgba(30, 32, 42, 0.85);
-  border: 1px solid rgba(100, 108, 255, 0.12);
+  background: rgba(28, 24, 20, 0.9);
+  border: 1px solid rgba(196, 148, 56, 0.14);
 }
 
 .dark .vp-doc div[class*='language-'] code {
   color: var(--vp-c-text-1);
 }
 
-/* --- 自定义容器 (tip / warning / danger) ---------------------------------- */
+/* =========================================================================
+ * 自定义容器
+ * ========================================================================= */
+
 .dark .vp-doc .custom-block {
-  border-left: 4px solid var(--vp-custom-block-info-border, var(--vp-c-divider));
+  border-left: 4px solid var(--vp-c-divider);
 }
 
 .dark .vp-doc .custom-block.tip {
-  background: rgba(100, 108, 255, 0.08);
-  border-left-color: var(--vp-c-brand-1);
+  background: rgba(196, 148, 56, 0.08);
+  border-left-color: var(--fishx-gold-1);
 }
 
 .dark .vp-doc .custom-block.warning {
@@ -41,44 +69,99 @@
   border-left-color: var(--vp-c-danger-1);
 }
 
-/* --- 特性卡片 (VPFeature) ------------------------------------------------ */
+/* =========================================================================
+ * 引用块
+ * ========================================================================= */
+
+.dark .vp-doc blockquote {
+  border-left: 4px solid var(--fishx-pink-3);
+  background: var(--fishx-pink-soft);
+  border-radius: 0 6px 6px 0;
+}
+
+/* =========================================================================
+ * 特性卡片
+ * ========================================================================= */
+
 .dark .VPFeature {
-  transition: border-color 0.3s, box-shadow 0.3s;
+  border-color: rgba(196, 148, 56, 0.18) !important;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s;
 }
 
 .dark .VPFeature:hover {
-  border-color: rgba(100, 108, 255, 0.4);
-  box-shadow: 0 0 16px rgba(100, 108, 255, 0.1);
+  border-color: rgba(196, 148, 56, 0.45) !important;
+  box-shadow: 0 4px 24px rgba(196, 148, 56, 0.12), 0 0 0 1px rgba(196, 148, 56, 0.08);
+  transform: translateY(-2px);
 }
 
-/* --- 导航栏 & 侧边栏 (毛玻璃) -------------------------------------------- */
+/* =========================================================================
+ * 导航栏 & 侧边栏 (毛玻璃 + 暖色边框)
+ * ========================================================================= */
+
+.dark .VPNavBar {
+  border-bottom: 1px solid rgba(196, 148, 56, 0.12);
+}
+
 .dark .VPNav .VPNavBar .wrapper .container {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-.dark .VPNavBar {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
 .dark .VPSidebar {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(196, 148, 56, 0.1);
 }
 
-/* --- 链接 hover 动画 ----------------------------------------------------- */
+/* =========================================================================
+ * 链接
+ * ========================================================================= */
+
 .dark .vp-doc a {
+  color: var(--fishx-gold-1);
   text-decoration: underline transparent;
-  text-underline-offset: 4px;
-  transition: text-decoration-color 0.25s;
+  text-underline-offset: 3px;
+  transition: color 0.2s, text-decoration-color 0.2s;
 }
 
 .dark .vp-doc a:hover {
-  text-decoration-color: var(--vp-c-brand-1);
+  color: var(--fishx-gold-2);
+  text-decoration-color: var(--fishx-gold-1);
 }
 
-/* --- 滚动条 -------------------------------------------------------------- */
+/* =========================================================================
+ * 侧边栏激活项
+ * ========================================================================= */
+
+.dark .VPSidebarItem.is-active > .item .text {
+  color: var(--fishx-gold-1) !important;
+}
+
+/* =========================================================================
+ * 导航激活链接
+ * ========================================================================= */
+
+.dark .VPNavBarMenuLink.active,
+.dark .VPNavBarMenuGroup.active > .button {
+  color: var(--fishx-gold-1) !important;
+}
+
+/* =========================================================================
+ * Hero 区域光晕 — 深色模式偏暗粉金
+ * ========================================================================= */
+
+.dark {
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    rgba(232, 144, 170, 0.6) 40%,
+    rgba(196, 148, 56, 0.7) 60%
+  );
+}
+
+/* =========================================================================
+ * 滚动条
+ * ========================================================================= */
+
 .dark ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -89,22 +172,39 @@
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(100, 108, 255, 0.25);
+  background: rgba(196, 148, 56, 0.28);
   border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 108, 255, 0.45);
+  background: rgba(196, 148, 56, 0.50);
 }
 
-/* --- 主题切换全局过渡 ---------------------------------------------------- */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* =========================================================================
+ * 选中文字高亮
+ * ========================================================================= */
+
+.dark ::selection {
+  background: rgba(196, 148, 56, 0.28);
+  color: inherit;
 }
 
-html,
-html.dark {
-  transition: color 0.3s, background-color 0.3s;
+/* =========================================================================
+ * 分割线 — 暖色调
+ * ========================================================================= */
+
+.dark .vp-doc hr {
+  border-top: 1px solid rgba(196, 148, 56, 0.18);
+}
+
+/* =========================================================================
+ * 表格
+ * ========================================================================= */
+
+.dark .vp-doc table thead tr {
+  background: rgba(196, 148, 56, 0.08);
+}
+
+.dark .vp-doc table tr:nth-child(even) {
+  background: rgba(196, 148, 56, 0.04);
 }

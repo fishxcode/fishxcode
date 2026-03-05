@@ -9,6 +9,16 @@ const SITE_URL = 'https://doc.fishxcode.com'
 const SITE_TITLE = 'FishXCode'
 const SITE_DESC = 'AI Coding 中转站 - 支持 Claude、Codex、Gemini 模型在多种平台使用'
 
+// GitHub Pages 子路径支持：
+//   - 本地开发 / Docker / 自定义域名：BASE = '/'
+//   - GitHub Pages 无自定义域名：CI 传入 VITEPRESS_BASE=/fishxcode/
+const BASE = (process.env.VITEPRESS_BASE ?? '/').replace(/([^/])$/, '$1/')
+
+/** 将站内绝对路径加上 base 前缀（供 head 标签使用，VitePress 不自动处理） */
+function p(path: string) {
+  return BASE.replace(/\/$/, '') + path
+}
+
 async function generateFeed(siteConfig: SiteConfig) {
   const feed = new Feed({
     title: SITE_TITLE,
@@ -42,16 +52,18 @@ async function generateFeed(siteConfig: SiteConfig) {
 }
 
 export default withPwa(defineConfig({
+  base: BASE,
   title: SITE_TITLE,
   description: SITE_DESC,
   lastUpdated: true,
+  cleanUrls: true,
   sitemap: {
     hostname: SITE_URL
   },
   head: [
-    ['link', { rel: 'icon', href: '/img/logo.svg' }],
-    ['link', { rel: 'alternate', type: 'application/rss+xml', title: 'FishXCode RSS', href: '/feed.xml' }],
-    ['link', { rel: 'alternate', type: 'application/atom+xml', title: 'FishXCode Atom', href: '/feed.atom' }],
+    ['link', { rel: 'icon', href: p('/img/logo.svg') }],
+    ['link', { rel: 'alternate', type: 'application/rss+xml', title: 'FishXCode RSS', href: p('/feed.xml') }],
+    ['link', { rel: 'alternate', type: 'application/atom+xml', title: 'FishXCode Atom', href: p('/feed.atom') }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'FishXCode' }],
     ['meta', { property: 'og:title', content: 'FishXCode - AI Coding 中转站' }],

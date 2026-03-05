@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   workflow_dispatch:
@@ -7,13 +7,24 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. 构建 VitePress → GitHub Pages
+  #
+  # VITEPRESS_BASE 优先级：
+  #   1. repo 变量 vars.VITEPRESS_BASE（Settings > Variables > Actions）
+  #   2. 兜底自动使用 /<仓库名>/  (e.g. /fishxcode/)
+  #
+  # 如果已绑定自定义域名 doc.fishxcode.com，在 repo Variables 设置：
+  #   VITEPRESS_BASE = /
+  # ──────────────────────────────────────────────────────────────────────────
+  build-pages:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,15 +40,30 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - uses: actions/cache@v4
+        with:
+          path: .vitepress/cache
+          key: vitepress-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.md', '.vitepress/config.mts') }}
+          restore-keys: |
+            vitepress-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            vitepress-${{ runner.os }}-
+
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+
+      - name: Build (GitHub Pages)
+        run: pnpm build
+        env:
+          VITEPRESS_BASE: ${{ vars.VITEPRESS_BASE || format('/{0}/', github.event.repository.name) }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .vitepress/dist
 
-  deploy:
-    needs: build
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. 部署到 GitHub Pages
+  # ──────────────────────────────────────────────────────────────────────────
+  deploy-pages:
+    needs: build-pages
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -45,3 +71,71 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 3. 构建并推送 Docker 镜像
+  #
+  # Docker 始终以 VITEPRESS_BASE=/ 构建，因为 nginx 从根路径服务。
+  # 借助 pnpm + VitePress + Docker 层三重缓存，二次构建极快。
+  # ──────────────────────────────────────────────────────────────────────────
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # 复用与 build-pages 相同的 VitePress 缓存 key
+      - uses: actions/cache@v4
+        with:
+          path: .vitepress/cache
+          key: vitepress-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.md', '.vitepress/config.mts') }}
+          restore-keys: |
+            vitepress-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            vitepress-${{ runner.os }}-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build (Docker, base=/)
+        run: pnpm build
+        env:
+          VITEPRESS_BASE: /
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
