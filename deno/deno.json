@@ -1,3 +1,6 @@
 {
-  "unstable": ["kv"]
+  "unstable": ["kv"],
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.unstable", "dom"]
+  }
 }
