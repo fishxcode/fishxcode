@@ -101,10 +101,11 @@ jobs:
           set -eo pipefail
           echo "::group::pg_restore → zeabur-sjc1"
           START=$(date +%s)
+          RC=0
           pg_restore -v -d "$DATABASE_URL" \
             --clean --if-exists \
             --no-owner --no-privileges \
-            /tmp/master_dump.dump 2>/tmp/restore_zeabur.log; RC=$?
+            /tmp/master_dump.dump 2>/tmp/restore_zeabur.log || RC=$?
           END=$(date +%s)
           cat /tmp/restore_zeabur.log
           echo "::endgroup::"
@@ -139,10 +140,11 @@ jobs:
           set -eo pipefail
           echo "::group::pg_restore → neon-azure"
           START=$(date +%s)
+          RC=0
           pg_restore -v -d "$DATABASE_URL" \
             --clean --if-exists \
             --no-owner --no-privileges \
-            /tmp/master_dump.dump 2>/tmp/restore_neon.log; RC=$?
+            /tmp/master_dump.dump 2>/tmp/restore_neon.log || RC=$?
           END=$(date +%s)
           cat /tmp/restore_neon.log
           echo "::endgroup::"
@@ -173,7 +175,7 @@ jobs:
       # ========== 4. 清理 ==========
       - name: Cleanup
         if: always()
-        run: rm -f /tmp/master_dump.dump /tmp/restore_*.log /tmp/backup-repo
+        run: rm -f /tmp/master_dump.dump /tmp/restore_*.log && rm -rf /tmp/backup-repo
 
       # ========== 5. 通知 ==========
       - name: Notify PushPlus
