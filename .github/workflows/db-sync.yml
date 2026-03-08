@@ -29,8 +29,8 @@ jobs:
           # 确保 PG18 二进制优先于系统自带旧版
           echo "/usr/lib/postgresql/18/bin" >> $GITHUB_PATH
 
-      # ========== 1. 导出主库 ==========
-      - name: Dump master (exclude logs data)
+      # ========== 1. 完整导出主库 ==========
+      - name: Dump master (full backup)
         env:
           PGPASSWORD: ${{ secrets.MASTER_DB_PASSWORD }}
           PGHOST: ${{ secrets.MASTER_DB_HOST }}
@@ -43,13 +43,16 @@ jobs:
           pg_dump -v \
             -F c \
             --compress=9 \
-            --exclude-table-data=logs \
             -f "$DUMP_FILE"
           END=$(date +%s)
           DUMP_SIZE=$(du -h "$DUMP_FILE" | cut -f1)
           echo "Dump size: $DUMP_SIZE, took $((END-START))s"
           echo "DUMP_SIZE=$DUMP_SIZE" >> $GITHUB_ENV
           echo "DUMP_TIME=$((END-START))s" >> $GITHUB_ENV
+
+          # 生成恢复清单，排除 logs 表数据（从库不需要日志）
+          pg_restore -l "$DUMP_FILE" | grep -v 'TABLE DATA.*logs' > /tmp/restore_list.txt
+          echo "Restore list: $(wc -l < /tmp/restore_list.txt) entries (logs data excluded)"
 
       # ========== 2. 备份到 Git 仓库 ==========
       - name: Push dump to backup repo
@@ -107,6 +110,7 @@ jobs:
           pg_restore -v -d "$DATABASE_URL" \
             --clean --if-exists \
             --no-owner --no-privileges \
+            -L /tmp/restore_list.txt \
             /tmp/master_dump.dump 2>/tmp/restore_zeabur.log || RC=$?
           END=$(date +%s)
           cat /tmp/restore_zeabur.log
@@ -146,6 +150,7 @@ jobs:
           pg_restore -v -d "$DATABASE_URL" \
             --clean --if-exists \
             --no-owner --no-privileges \
+            -L /tmp/restore_list.txt \
             /tmp/master_dump.dump 2>/tmp/restore_neon.log || RC=$?
           END=$(date +%s)
           cat /tmp/restore_neon.log
@@ -177,7 +182,7 @@ jobs:
       # ========== 4. 清理 ==========
       - name: Cleanup
         if: always()
-        run: rm -f /tmp/master_dump.dump /tmp/restore_*.log && rm -rf /tmp/backup-repo
+        run: rm -f /tmp/master_dump.dump /tmp/restore_*.log /tmp/restore_list.txt && rm -rf /tmp/backup-repo
 
       # ========== 5. 通知 ==========
       - name: Notify PushPlus
