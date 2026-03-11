@@ -7,7 +7,8 @@ package-lock.json
 !pnpm-lock.yaml
 
 # 部署脚本（本地使用，不提交）
-deno/proxy.ts
-deno/cf-worker.ts
-deno/cf-worker.js
+deno/
 .action.env
+.deploy.env
+scripts/
+supabase/
