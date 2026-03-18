@@ -16,6 +16,9 @@ jobs:
     timeout-minutes: 30
     env:
       DUMP_FILE: /tmp/master_dump.dump
+      # ── 从库列表由单个 Secret 管理，每行格式: name|dsn ──
+      # 新增从库只需编辑 GitHub Secret SLAVE_DSNS，无需改 workflow
+      SLAVE_DSNS: ${{ secrets.SLAVE_DSNS }}
     steps:
       - name: Install PostgreSQL 18 client
         run: |
@@ -32,15 +35,11 @@ jobs:
       # ========== 1. 完整导出主库 ==========
       - name: Dump master (full backup)
         env:
-          PGPASSWORD: ${{ secrets.MASTER_DB_PASSWORD }}
-          PGHOST: ${{ secrets.MASTER_DB_HOST }}
-          PGPORT: ${{ secrets.MASTER_DB_PORT }}
-          PGUSER: ${{ secrets.MASTER_DB_USER }}
-          PGDATABASE: ${{ secrets.MASTER_DB_NAME }}
+          DATABASE_URL: ${{ secrets.MASTER_DSN }}
         run: |
           set -e
           START=$(date +%s)
-          pg_dump -v \
+          pg_dump -v -d "$DATABASE_URL" \
             -F c \
             --compress=9 \
             -f "$DUMP_FILE"
@@ -98,121 +97,112 @@ jobs:
           fi
           rm -rf /tmp/backup-repo
 
-      # ========== 3. 恢复到从库 (串行，避免 artifact 泄露) ==========
-      - name: Restore to zeabur-sjc1
-        env:
-          DATABASE_URL: ${{ secrets.SLAVE_ZEABUR_DSN }}
+      # ========== 3. 检查从库列表 ==========
+      - name: Validate SLAVE_DSNS
         run: |
-          set -eo pipefail
-          echo "::group::pg_restore → zeabur-sjc1"
-          START=$(date +%s)
-          RC=0
-          pg_restore -v -d "$DATABASE_URL" \
-            --clean --if-exists \
-            --no-owner --no-privileges \
-            -L /tmp/restore_list.txt \
-            /tmp/master_dump.dump 2>/tmp/restore_zeabur.log || RC=$?
-          END=$(date +%s)
-          cat /tmp/restore_zeabur.log
-          echo "::endgroup::"
-
-          FATAL=$(grep -cE "FATAL|could not connect|authentication failed|no password supplied" /tmp/restore_zeabur.log || true)
-          if [ "$FATAL" -gt 0 ]; then
-            echo "::error::zeabur-sjc1 restore fatal error"
+          if [ -z "$SLAVE_DSNS" ]; then
+            echo "::error::SLAVE_DSNS secret is empty or not set"
             exit 1
           fi
-          if [ "$RC" -gt 1 ]; then
-            echo "::error::pg_restore failed (exit $RC)"
+          # 统计有效行数
+          VALID=$(echo "$SLAVE_DSNS" | grep -cE '^[a-zA-Z0-9_-]+\|postgresql://' || true)
+          echo "Found $VALID slave(s) in SLAVE_DSNS"
+          if [ "$VALID" -eq 0 ]; then
+            echo "::error::No valid 'name|postgresql://...' entries found in SLAVE_DSNS"
             exit 1
           fi
-          echo "zeabur-sjc1 restore took $((END-START))s (exit: $RC)"
-          echo "ZEABUR_TIME=$((END-START))s" >> $GITHUB_ENV
-          echo "ZEABUR_RC=$RC" >> $GITHUB_ENV
 
-      - name: Verify zeabur-sjc1
-        continue-on-error: true
-        env:
-          DATABASE_URL: ${{ secrets.SLAVE_ZEABUR_DSN }}
+      # ========== 4. 恢复到所有从库 (循环串行，单库失败不阻断其他) ==========
+      - name: Restore & verify all slaves
+        shell: bash
         run: |
-          set -e
-          # 重试机制：最多尝试 3 次
-          for i in 1 2 3; do
-            COUNT=$(psql -A -t "$DATABASE_URL" -c "SELECT count(*) FROM pg_stat_user_tables;" 2>/dev/null | tr -d '[:space:]') && break
-            echo "::warning::Attempt $i failed, retrying in 5s..."
-            sleep 5
-          done
+          # 不用 set -e，手动控制每个从库的错误处理
+          REPORT=""
+          FAILED=0
+          TOTAL=0
+          SUCCESS=0
 
-          # 空值检查
-          if [ -z "$COUNT" ]; then
-            echo "::warning::zeabur-sjc1: Unable to verify (connection failed)"
-            echo "ZEABUR_TABLES=?" >> $GITHUB_ENV
-            exit 0
-          fi
+          while IFS='|' read -r SLAVE_NAME SLAVE_DSN; do
+            # 跳过空行、空白行、注释行
+            SLAVE_NAME=$(echo "$SLAVE_NAME" | xargs)  # trim whitespace
+            [ -z "$SLAVE_NAME" ] && continue
+            [[ "$SLAVE_NAME" == \#* ]] && continue
+            [ -z "$SLAVE_DSN" ] && { echo "::warning::${SLAVE_NAME}: missing DSN, skipped"; continue; }
 
-          echo "zeabur-sjc1: $COUNT tables"
-          if [ "$COUNT" -ge 10 ]; then
-            echo "ZEABUR_TABLES=$COUNT" >> $GITHUB_ENV
-          else
-            echo "::warning::Table count ($COUNT) lower than expected (10)"
-            echo "ZEABUR_TABLES=$COUNT⚠️" >> $GITHUB_ENV
-          fi
+            TOTAL=$((TOTAL+1))
+            echo ""
+            echo "========== [$TOTAL] pg_restore → ${SLAVE_NAME} =========="
+            echo "::group::pg_restore → ${SLAVE_NAME}"
+            START=$(date +%s)
+            RC=0
+            LOG_FILE="/tmp/restore_${SLAVE_NAME}.log"
 
-      - name: Restore to neon-azure
-        env:
-          DATABASE_URL: ${{ secrets.SLAVE_NEON_DSN }}
-        run: |
-          set -eo pipefail
-          echo "::group::pg_restore → neon-azure"
-          START=$(date +%s)
-          RC=0
-          pg_restore -v -d "$DATABASE_URL" \
-            --clean --if-exists \
-            --no-owner --no-privileges \
-            -L /tmp/restore_list.txt \
-            /tmp/master_dump.dump 2>/tmp/restore_neon.log || RC=$?
-          END=$(date +%s)
-          cat /tmp/restore_neon.log
-          echo "::endgroup::"
+            pg_restore -v -d "${SLAVE_DSN}" \
+              --clean --if-exists \
+              --no-owner --no-privileges \
+              -L /tmp/restore_list.txt \
+              "$DUMP_FILE" 2>"$LOG_FILE" || RC=$?
 
-          FATAL=$(grep -cE "FATAL|could not connect|authentication failed|no password supplied" /tmp/restore_neon.log || true)
-          if [ "$FATAL" -gt 0 ]; then
-            echo "::error::neon-azure restore fatal error"
+            END=$(date +%s)
+            ELAPSED=$((END-START))
+            cat "$LOG_FILE"
+            echo "::endgroup::"
+
+            # 检查致命连接错误
+            FATAL=$(grep -cE "FATAL|could not connect|authentication failed|no password supplied|Connection refused" "$LOG_FILE" || true)
+            if [ "$FATAL" -gt 0 ]; then
+              echo "::error::${SLAVE_NAME} restore fatal connection error"
+              REPORT="${REPORT}${SLAVE_NAME}|FATAL|?|${ELAPSED}s"$'\n'
+              FAILED=$((FAILED+1))
+              continue
+            fi
+            # pg_restore exit 1 = warnings (如 relation already exists)，可接受
+            if [ "$RC" -gt 1 ]; then
+              echo "::error::${SLAVE_NAME} pg_restore failed (exit $RC)"
+              REPORT="${REPORT}${SLAVE_NAME}|FAIL(rc=${RC})|?|${ELAPSED}s"$'\n'
+              FAILED=$((FAILED+1))
+              continue
+            fi
+
+            echo "${SLAVE_NAME} restore took ${ELAPSED}s (exit: $RC)"
+
+            # 验证表数量 (重试 3 次)
+            TABLE_COUNT=""
+            for i in 1 2 3; do
+              TABLE_COUNT=$(psql -A -t "${SLAVE_DSN}" -c "SELECT count(*) FROM pg_stat_user_tables;" 2>/dev/null | tr -d '[:space:]') && break
+              echo "::warning::${SLAVE_NAME} verify attempt $i failed, retrying in 5s..."
+              TABLE_COUNT=""
+              sleep 5
+            done
+
+            if [ -z "$TABLE_COUNT" ]; then
+              echo "::warning::${SLAVE_NAME}: Unable to verify (connection failed after 3 retries)"
+              TABLE_COUNT="?"
+            else
+              echo "${SLAVE_NAME}: ${TABLE_COUNT} tables"
+              if [ "$TABLE_COUNT" -lt 10 ] 2>/dev/null; then
+                echo "::warning::${SLAVE_NAME} table count ($TABLE_COUNT) lower than expected"
+              fi
+            fi
+
+            REPORT="${REPORT}${SLAVE_NAME}|OK|${TABLE_COUNT}|${ELAPSED}s"$'\n'
+            SUCCESS=$((SUCCESS+1))
+
+          done <<< "$SLAVE_DSNS"
+
+          echo ""
+          echo "===== Summary: ${SUCCESS}/${TOTAL} slaves OK, ${FAILED} failed ====="
+
+          # 写入汇总到环境变量供通知步骤使用
+          {
+            echo "SYNC_REPORT<<REPORT_EOF"
+            echo "$REPORT"
+            echo "REPORT_EOF"
+          } >> $GITHUB_ENV
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::error::${FAILED}/${TOTAL} slave(s) failed"
             exit 1
-          fi
-          if [ "$RC" -gt 1 ]; then
-            echo "::error::pg_restore failed (exit $RC)"
-            exit 1
-          fi
-          echo "neon-azure restore took $((END-START))s (exit: $RC)"
-          echo "NEON_TIME=$((END-START))s" >> $GITHUB_ENV
-          echo "NEON_RC=$RC" >> $GITHUB_ENV
-
-      - name: Verify neon-azure
-        continue-on-error: true
-        env:
-          DATABASE_URL: ${{ secrets.SLAVE_NEON_DSN }}
-        run: |
-          set -e
-          # 重试机制：最多尝试 3 次
-          for i in 1 2 3; do
-            COUNT=$(psql -A -t "$DATABASE_URL" -c "SELECT count(*) FROM pg_stat_user_tables;" 2>/dev/null | tr -d '[:space:]') && break
-            echo "::warning::Attempt $i failed, retrying in 5s..."
-            sleep 5
-          done
-
-          # 空值检查
-          if [ -z "$COUNT" ]; then
-            echo "::warning::neon-azure: Unable to verify (connection failed)"
-            echo "NEON_TABLES=?" >> $GITHUB_ENV
-            exit 0
-          fi
-
-          echo "neon-azure: $COUNT tables"
-          if [ "$COUNT" -ge 10 ]; then
-            echo "NEON_TABLES=$COUNT" >> $GITHUB_ENV
-          else
-            echo "::warning::Table count ($COUNT) lower than expected (10)"
-            echo "NEON_TABLES=$COUNT⚠️" >> $GITHUB_ENV
           fi
 
       # ========== 4. 清理 ==========
@@ -220,26 +210,36 @@ jobs:
         if: always()
         run: rm -f /tmp/master_dump.dump /tmp/restore_*.log /tmp/restore_list.txt && rm -rf /tmp/backup-repo
 
-      # ========== 5. 通知 ==========
+      # ========== 6. 通知 ==========
       - name: Notify PushPlus
         if: always()
         run: |
           STATUS="${{ job.status }}"
           SYNC_TIME="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          ZEABUR_TABLES="${ZEABUR_TABLES:-?}"
-          NEON_TABLES="${NEON_TABLES:-?}"
           DUMP_SIZE="${DUMP_SIZE:-?}"
           DUMP_TIME="${DUMP_TIME:-?}"
-          ZEABUR_TIME="${ZEABUR_TIME:-?}"
-          NEON_TIME="${NEON_TIME:-?}"
 
           if [ "$STATUS" = "success" ]; then
             TITLE="✅ DB 同步成功"
-            CONTENT="<h3>主→从 数据库同步完成</h3><table><tr><td>时间</td><td>${SYNC_TIME}</td></tr><tr><td>备份大小</td><td>${DUMP_SIZE}</td></tr><tr><td>导出耗时</td><td>${DUMP_TIME}</td></tr><tr><td>zeabur-sjc1</td><td>${ZEABUR_TABLES} 表 (${ZEABUR_TIME})</td></tr><tr><td>neon-azure</td><td>${NEON_TABLES} 表 (${NEON_TIME})</td></tr></table><p><a href='${RUN_URL}'>查看详情</a></p>"
+            ROWS=""
+            if [ -n "${SYNC_REPORT:-}" ]; then
+              while IFS='|' read -r NAME RESULT TABLES TIME; do
+                [ -z "$NAME" ] && continue
+                ROWS="${ROWS}<tr><td>${NAME}</td><td>${RESULT}</td><td>${TABLES} 表</td><td>${TIME}</td></tr>"
+              done <<< "$SYNC_REPORT"
+            fi
+            CONTENT="<h3>主→从 数据库同步完成</h3><table><tr><td>时间</td><td colspan=3>${SYNC_TIME}</td></tr><tr><td>备份大小</td><td colspan=3>${DUMP_SIZE}</td></tr><tr><td>导出耗时</td><td colspan=3>${DUMP_TIME}</td></tr><tr><th>从库</th><th>状态</th><th>表数</th><th>耗时</th></tr>${ROWS}</table><p><a href='${RUN_URL}'>查看详情</a></p>"
           else
             TITLE="❌ DB 同步失败"
-            CONTENT="<h3>主→从 数据库同步失败</h3><p><a href='${RUN_URL}'>查看日志</a></p>"
+            ROWS=""
+            if [ -n "${SYNC_REPORT:-}" ]; then
+              while IFS='|' read -r NAME RESULT TABLES TIME; do
+                [ -z "$NAME" ] && continue
+                ROWS="${ROWS}<tr><td>${NAME}</td><td>${RESULT}</td><td>${TABLES} 表</td><td>${TIME}</td></tr>"
+              done <<< "$SYNC_REPORT"
+            fi
+            CONTENT="<h3>主→从 数据库同步失败</h3><table><tr><th>从库</th><th>状态</th><th>表数</th><th>耗时</th></tr>${ROWS}</table><p><a href='${RUN_URL}'>查看日志</a></p>"
           fi
 
           jq -n \
@@ -257,16 +257,22 @@ jobs:
           STATUS="${{ job.status }}"
           SYNC_TIME="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          ZEABUR_TABLES="${ZEABUR_TABLES:-?}"
-          NEON_TABLES="${NEON_TABLES:-?}"
           DUMP_SIZE="${DUMP_SIZE:-?}"
+
+          SLAVE_LINES=""
+          if [ -n "${SYNC_REPORT:-}" ]; then
+            while IFS='|' read -r NAME RESULT TABLES TIME; do
+              [ -z "$NAME" ] && continue
+              SLAVE_LINES="${SLAVE_LINES}- ${NAME}：${RESULT} / ${TABLES} 表 (${TIME})\n"
+            done <<< "$SYNC_REPORT"
+          fi
 
           if [ "$STATUS" = "success" ]; then
             COLOR="green"
-            TEXT="**✅ DB 同步成功**\n\n- 时间：${SYNC_TIME}\n- 备份：${DUMP_SIZE}\n- zeabur-sjc1：${ZEABUR_TABLES} 表\n- neon-azure：${NEON_TABLES} 表"
+            TEXT="**✅ DB 同步成功**\n\n- 时间：${SYNC_TIME}\n- 备份：${DUMP_SIZE}\n${SLAVE_LINES}"
           else
             COLOR="red"
-            TEXT="**❌ DB 同步失败**\n\n[查看日志](${RUN_URL})"
+            TEXT="**❌ DB 同步失败**\n\n- 时间：${SYNC_TIME}\n${SLAVE_LINES}\n[查看日志](${RUN_URL})"
           fi
 
           jq -n \
