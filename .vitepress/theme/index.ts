@@ -1,5 +1,5 @@
 // https://vitepress.dev/guide/custom-theme
-import { h, onMounted, watch, nextTick } from 'vue'
+import { h, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import type { Theme } from 'vitepress'
 import { useRoute } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
@@ -11,6 +11,7 @@ import ModelCards from './components/ModelCards.vue'
 import ToolWizard from './components/ToolWizard.vue'
 import Timeline from './components/Timeline.vue'
 import VideoPlayer from './components/VideoPlayer.vue'
+import { initIframeBridge, notifyRouteChange, destroyIframeBridge } from './utils/iframeBridge'
 import './style.css'
 import './dark-mode.css'
 import 'virtual:group-icons.css'
@@ -29,8 +30,20 @@ export default {
     const initZoom = () => {
       mediumZoom('.vp-doc img', { background: 'var(--vp-c-bg)' })
     }
-    onMounted(initZoom)
-    watch(() => route.path, () => nextTick(initZoom))
+
+    onMounted(() => {
+      initZoom()
+      initIframeBridge()
+    })
+
+    onUnmounted(() => {
+      destroyIframeBridge()
+    })
+
+    watch(() => route.path, () => nextTick(() => {
+      initZoom()
+      notifyRouteChange()
+    }))
   },
   enhanceApp({ app }) {
     app.component('ModelCards', ModelCards)
