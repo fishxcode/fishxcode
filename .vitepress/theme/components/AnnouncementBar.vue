@@ -19,7 +19,7 @@ const I18N: Record<string, { text: string; linkText: string }> = {
 const { lang } = useData()
 const t = computed(() => I18N[lang.value] ?? I18N['zh-CN'])
 
-const BAR_HEIGHT = '36px'
+const BAR_HEIGHT = '70px'
 
 const visible = ref(false)
 
@@ -63,7 +63,7 @@ function dismiss() {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
+  height: 70px;
   background-color: var(--vp-c-brand-3);
   color: var(--vp-c-white);
   font-size: 14px;
