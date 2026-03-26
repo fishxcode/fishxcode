@@ -25,7 +25,7 @@ const visible = ref(false)
 const inIframe = ref(false)
 
 function setLayoutOffset(height: string) {
-  document.documentElement.style.setProperty('--vp-layout-top-height', height)
+  // document.documentElement.style.setProperty('--vp-layout-top-height', height)
 }
 
 function checkInIframe(): boolean {

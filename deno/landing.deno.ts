@@ -23,55 +23,93 @@ const SUB_CYCLES: { key: CycleKey; label: string }[] = [
   { key: "monthly", label: "月订阅" },
 ];
 
+type GroupKey = "claude" | "codex" | "other";
+
+function formatResetRuleLabel(period: QuotaResetPeriod): string {
+  if (period === "never") return "订阅周期内不重置（用完或到期结束）";
+  if (period === "daily") return "每日重置（按自然日刷新）";
+  if (period === "monthly") return "每月重置（按自然月刷新）";
+  return "按平台规则重置";
+}
+
+function formatDurationLabel(unit: DurationUnit, value: number): string {
+  if (unit === "day") return `${value}天`;
+  if (unit === "month") return `${value}个月`;
+  if (unit === "year") return `${value}年`;
+  return `${value}${unit}`;
+}
+
+function matchCycle(plan: RawSubscriptionPlan, cycle: CycleKey): boolean {
+  if (cycle === "daily") return plan.duration_unit === "day" && plan.duration_value === 1;
+  if (cycle === "weekly") return plan.duration_unit === "day" && plan.duration_value === 7;
+  return plan.duration_unit === "month" && plan.duration_value === 1;
+}
+
+function detectGroupKey(title: string): GroupKey {
+  const lowered = title.toLowerCase();
+  if (lowered.includes("claude")) return "claude";
+  if (lowered.includes("codex")) return "codex";
+  return "other";
+}
+
+function resolveCycleKey(plan: RawSubscriptionPlan): CycleKey | null {
+  if (matchCycle(plan, "daily")) return "daily";
+  if (matchCycle(plan, "weekly")) return "weekly";
+  if (matchCycle(plan, "monthly")) return "monthly";
+  return null;
+}
+
 function buildSubscriptionMatrix(plans: RawSubscriptionPlan[]) {
   const enabledPlans = plans.filter((plan) => plan.enabled);
 
-  const groupedByCycle: Record<CycleKey, RawSubscriptionPlan[]> = {
-    daily: [],
-    weekly: [],
-    monthly: [],
+  const groupedByProduct: Record<GroupKey, RawSubscriptionPlan[]> = {
+    claude: [],
+    codex: [],
+    other: [],
   };
 
-  for (const cycle of SUB_CYCLES) {
-    groupedByCycle[cycle.key] = enabledPlans
-      .filter((plan) => matchCycle(plan, cycle.key))
-      .sort((a, b) => a.price_amount - b.price_amount);
+  for (const plan of enabledPlans) {
+    groupedByProduct[detectGroupKey(plan.title)].push(plan);
   }
 
-  const maxRows = Math.max(...SUB_CYCLES.map((cycle) => groupedByCycle[cycle.key].length), 0);
+  const cycleOrder: Record<CycleKey, number> = { daily: 0, weekly: 1, monthly: 2 };
+  const groupOrder: Record<GroupKey, number> = { claude: 0, codex: 1, other: 2 };
+  const groupLabel: Record<GroupKey, string> = { claude: "Claude 套餐", codex: "Codex 套餐", other: "其他套餐" };
 
-  const rows = Array.from({ length: maxRows }, (_, rowIdx) => {
-    const cells = SUB_CYCLES.reduce((acc, cycle) => {
-      const plan = groupedByCycle[cycle.key][rowIdx] ?? null;
-      acc[cycle.key] = {
-        cycleKey: cycle.key,
-        plan: plan
-          ? {
-              id: plan.id,
-              title: plan.title,
-              subtitle: plan.subtitle,
-              priceAmount: plan.price_amount,
-              currency: plan.currency,
-              durationLabel: formatDurationLabel(plan.duration_unit, plan.duration_value),
-              resetRuleLabel: formatResetRuleLabel(plan.quota_reset_period),
-              totalAmount: plan.total_amount,
-            }
-          : null,
-        comingSoon: plan === null,
+  const groups = (Object.keys(groupedByProduct) as GroupKey[])
+    .filter((groupKey) => groupedByProduct[groupKey].length > 0)
+    .sort((a, b) => groupOrder[a] - groupOrder[b])
+    .map((groupKey) => {
+      const items = groupedByProduct[groupKey]
+        .map((plan) => {
+          const cycleKey = resolveCycleKey(plan);
+          return {
+            id: plan.id,
+            title: plan.title,
+            subtitle: plan.subtitle,
+            priceAmount: plan.price_amount,
+            currency: plan.currency,
+            cycleKey,
+            durationLabel: formatDurationLabel(plan.duration_unit, plan.duration_value),
+            resetRuleLabel: formatResetRuleLabel(plan.quota_reset_period),
+            totalAmount: plan.total_amount,
+          };
+        })
+        .sort((a, b) => {
+          const cycleA = a.cycleKey ? cycleOrder[a.cycleKey] : 99;
+          const cycleB = b.cycleKey ? cycleOrder[b.cycleKey] : 99;
+          if (cycleA !== cycleB) return cycleA - cycleB;
+          return a.priceAmount - b.priceAmount;
+        });
+
+      return {
+        groupKey,
+        label: groupLabel[groupKey],
+        plans: items,
       };
-      return acc;
-    }, {} as Record<CycleKey, { cycleKey: CycleKey; plan: any; comingSoon: boolean }>);
+    });
 
-    return {
-      rank: rowIdx + 1,
-      cells,
-    };
-  });
-
-  return {
-    cycles: SUB_CYCLES,
-    rows,
-  };
+  return { groups };
 }
 
 const port = Number(Deno.env.get("PORT")) || 8001;
@@ -553,7 +591,131 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
     }
     .foot-link:hover { color: #c9973e; }
 
-    /* Dark mode text helpers */
+    .support-qr-list {
+      display: grid;
+      gap: 10px;
+    }
+    .support-qr-trigger {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(224, 200, 112, 0.25);
+      background: rgba(224, 200, 112, 0.08);
+      text-decoration: none;
+      color: #e0c870;
+      font-size: 13px;
+      line-height: 1.4;
+      transition: all 0.2s ease;
+    }
+    .support-qr-trigger:hover {
+      border-color: rgba(224, 200, 112, 0.45);
+      background: rgba(224, 200, 112, 0.16);
+      transform: translateY(-1px);
+    }
+    .support-qr-thumb {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #fff;
+      border: 1px solid rgba(224, 200, 112, 0.35);
+      flex-shrink: 0;
+    }
+
+    .support-gallery {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+    }
+    .support-gallery.open { display: block; }
+    .support-gallery-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(2px);
+    }
+    .support-gallery-panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+    }
+    .support-gallery-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .support-gallery-stage {
+      width: min(92vw, 740px);
+      height: min(74vh, 740px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(17, 17, 17, 0.72);
+      border: 1px solid rgba(255,255,255,0.18);
+      touch-action: none;
+      user-select: none;
+    }
+    .support-gallery-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transform-origin: center center;
+      transition: transform 0.15s ease;
+      will-change: transform;
+    }
+    .support-gallery-caption {
+      color: #f8e7b8;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      max-width: min(92vw, 740px);
+    }
+    .support-gallery-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .support-gallery-btn {
+      border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 44px;
+    }
+    .support-gallery-counter {
+      color: #d1d5db;
+      font-size: 13px;
+      min-width: 56px;
+      text-align: center;
+    }
+    body.support-gallery-open { overflow: hidden; }
+
     [data-theme="dark"] .text-gray-900 { color: #e2d8c8 !important; }
     [data-theme="dark"] .text-gray-800 { color: #cdc4b4 !important; }
     [data-theme="dark"] .text-gray-700 { color: #94a3b8 !important; }
@@ -633,6 +795,54 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       color: #a3b8d0;
       overflow-x: auto;
     }
+    .terminal-docs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .terminal-doc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(163,184,208,0.2);
+      color: #a3b8d0;
+      background: rgba(163,184,208,0.08);
+      transition: all 0.2s;
+    }
+    .terminal-doc-link.primary {
+      color: #86efac;
+      border-color: rgba(134,239,172,0.35);
+      background: rgba(134,239,172,0.1);
+    }
+    .terminal-doc-link:hover { opacity: 0.9; }
+    .terminal-tabs {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .terminal-tab {
+      background: rgba(163,184,208,0.12);
+      color: #a3b8d0;
+      border: 1px solid rgba(163,184,208,0.2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .terminal-tab.active {
+      color: #2a251f;
+      background: #86efac;
+      border-color: #86efac;
+    }
+    #terminalContent p { margin: 0; }
     .terminal-body .cm { color: #6a7a8e; }
     .terminal-body .kw { color: #c084fc; }
     .terminal-body .str { color: #86efac; }
@@ -709,35 +919,77 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       font-size: 28px;
     }
 
-    /* Subscription matrix */
+    /* Subscription groups */
     .subscription-wrap {
+      display: grid;
+      gap: 14px;
+    }
+    .sub-group {
       background: var(--surface);
       border: 1px solid var(--surface-border);
-      border-radius: 24px;
+      border-radius: 18px;
       box-shadow: var(--card-shadow);
       overflow: hidden;
     }
-    .subscription-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      border-top: 1px solid var(--surface-border);
-    }
-    .sub-head,
-    .sub-cell {
-      padding: 16px 14px;
-      border-right: 1px solid var(--surface-border);
-      border-bottom: 1px solid var(--surface-border);
-    }
-    .sub-head {
-      font-weight: 700;
-      text-align: center;
-      color: var(--text);
+    .sub-group-head {
+      width: 100%;
+      border: 0;
       background: var(--bg-soft);
+      color: var(--text);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      text-align: left;
+    }
+    .sub-group-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .sub-group-chevron {
+      transition: transform 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+    .sub-group.open .sub-group-chevron { transform: rotate(90deg); }
+    .sub-group-body {
+      display: none;
+      padding: 14px;
+      background: var(--surface);
+    }
+    .sub-group.open .sub-group-body { display: block; }
+    .sub-cards {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
     .sub-cell {
       background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 14px;
     }
     .sub-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .sub-cycle {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #7a5020;
+      background: var(--bg-soft);
+      border: 1px solid var(--surface-border);
+      margin-bottom: 8px;
+    }
+    [data-theme="dark"] .sub-cycle { color: #e0c870; }
     .sub-price { font-size: 24px; line-height: 1.1; font-weight: 800; color: #c9973e; margin-top: 8px; }
     .sub-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
     .sub-expand {
@@ -789,8 +1041,8 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       .url-bar-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .url-bar-btn { width: 100%; justify-content: center; border-radius: 6px; margin-top: 2px; }
 
-      .subscription-wrap { border-radius: 16px; overflow-x: auto; }
-      .subscription-grid { min-width: 900px; }
+      .subscription-wrap { border-radius: 16px; }
+      .sub-cards { grid-template-columns: 1fr; }
 
       /* 迁移卡片内边距缩小 */
       .migration-card { padding: 24px 20px; }
@@ -987,12 +1239,15 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
             <span style="color:#6a7a8e;font-size:12px;margin-left:8px;font-family:inherit">TERMINAL — zsh</span>
           </div>
           <div class="terminal-body">
-            <p><span class="cm" data-i18n="terminal.comment">// 配置 Claude Code（只需两行）</span></p>
-            <p><span class="kw">export</span> <span class="var">ANTHROPIC_BASE_URL</span><span class="op">=</span><span class="str">"https://fishxcode.com"</span></p>
-            <p><span class="kw">export</span> <span class="var">ANTHROPIC_API_KEY</span><span class="op">=</span><span class="str">"sk-..."</span></p>
-            <p></p>
-            <p><span class="cm" data-i18n="terminal.start"># 开始编码</span></p>
-            <p><span class="run">$</span> <span style="color:#e2e8f0">claude</span></p>
+            <div class="terminal-docs">
+              <a id="terminalPrimaryDoc" href="https://doc.fishxcode.com/start" target="_blank" class="terminal-doc-link primary"></a>
+              <a id="terminalSecondaryDoc" href="https://doc.fishxcode.com/codex" target="_blank" class="terminal-doc-link secondary"></a>
+            </div>
+            <div class="terminal-tabs" role="tablist" aria-label="Tool Tabs">
+              <button id="terminalTabClaude" class="terminal-tab active" role="tab" aria-selected="true" onclick="setTerminalTab('claude')" data-i18n="terminal.tab.claude">Claude</button>
+              <button id="terminalTabCodex" class="terminal-tab" role="tab" aria-selected="false" onclick="setTerminalTab('codex')" data-i18n="terminal.tab.codex">Codex</button>
+            </div>
+            <div id="terminalContent"></div>
           </div>
         </div>
       </div>
@@ -1012,13 +1267,7 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         <p class="text-gray-500 text-lg max-w-2xl mx-auto" data-i18n="sub.desc">覆盖个人、团队、企业三类使用场景，按需选择订阅周期与档位</p>
       </div>
 
-      <div class="subscription-wrap">
-        <div id="subscriptionMatrix" class="subscription-grid">
-          <div class="sub-head" data-i18n="sub.cycle.daily">天订阅</div>
-          <div class="sub-head" data-i18n="sub.cycle.weekly">周订阅</div>
-          <div class="sub-head" data-i18n="sub.cycle.monthly">月订阅</div>
-        </div>
-      </div>
+      <div class="subscription-wrap" id="subscriptionMatrix"></div>
 
       <div class="text-center mt-8">
         <a href="https://fishxcode.com/console/topup" target="_blank" class="btn-primary text-base" style="padding:14px 34px;justify-content:center">
@@ -1167,7 +1416,7 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
               <div class="step-num">3</div>
               <div>
                 <p class="font-semibold text-gray-800" data-i18n="step3.title">配置你的工具</p>
-                <p class="text-gray-500 text-sm mt-0.5" data-i18n-html="step3.desc">参考 <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">接入指南</a>，将 Base URL 和 Key 填入对应工具</p>
+                <p class="text-gray-500 text-sm mt-0.5" data-i18n-html="step3.desc">Claude 教程：<a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Codex 教程：<a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a></p>
               </div>
             </li>
             <li class="flex gap-4 items-start">
@@ -1306,25 +1555,29 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         <!-- Support -->
         <div>
           <h4 class="font-bold text-white mb-4 text-sm uppercase tracking-wider" data-i18n="footer.support">支持</h4>
-          <ul class="space-y-2.5">
+          <ul class="space-y-2.5 support-qr-list">
             <li>
-              <a href="https://pre.fishxcode.com/qq_group.jpg" target="_blank" class="foot-link" style="color:#e0c870">
-                QQ群：373865837（查看二维码）
+              <a href="https://pre.fishxcode.com/qq_group.jpg" target="_blank" class="support-qr-trigger" style="color:#e0c870" data-gallery-index="0">
+                <img src="https://pre.fishxcode.com/qq_group.jpg" alt="QQ群二维码" class="support-qr-thumb" loading="lazy" />
+                <span>QQ群：373865837（点击查看）</span>
               </a>
             </li>
             <li>
-              <a href="https://pre.fishxcode.com/fishxcode_user.jpg" target="_blank" class="foot-link" style="color:#e0c870">
-                微信号：fishxcode（查看二维码）
+              <a href="https://pre.fishxcode.com/fishxcode_user.jpg" target="_blank" class="support-qr-trigger" style="color:#e0c870" data-gallery-index="1">
+                <img src="https://pre.fishxcode.com/fishxcode_user.jpg" alt="微信号二维码" class="support-qr-thumb" loading="lazy" />
+                <span>微信号：fishxcode（点击查看）</span>
               </a>
             </li>
             <li>
-              <a href="https://pre.fishxcode.com/wechat_group.jpg" target="_blank" class="foot-link" style="color:#e0c870">
-                微信群（查看二维码）
+              <a href="https://pre.fishxcode.com/wechat_group.jpg" target="_blank" class="support-qr-trigger" style="color:#e0c870" data-gallery-index="2">
+                <img src="https://pre.fishxcode.com/wechat_group.jpg" alt="微信群二维码" class="support-qr-thumb" loading="lazy" />
+                <span>微信群（点击查看）</span>
               </a>
             </li>
             <li>
-              <a href="https://pre.fishxcode.com/qq.png" target="_blank" class="foot-link" style="color:#e0c870">
-                QQ客服：2013571175（查看二维码）
+              <a href="https://pre.fishxcode.com/qq.png" target="_blank" class="support-qr-trigger" style="color:#e0c870" data-gallery-index="3">
+                <img src="https://pre.fishxcode.com/qq.png" alt="QQ客服二维码" class="support-qr-thumb" loading="lazy" />
+                <span>QQ客服：2013571175（点击查看）</span>
               </a>
             </li>
             <li><a href="mailto:support@fishxcode.com" class="foot-link" style="color:#e0c870" data-i18n="footer.cs">联系客服邮箱</a></li>
@@ -1354,6 +1607,24 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       </div>
     </div>
   </footer>
+
+  <div id="supportGallery" class="support-gallery" aria-hidden="true">
+    <div class="support-gallery-backdrop" onclick="closeSupportGallery()"></div>
+    <div class="support-gallery-panel" role="dialog" aria-modal="true" aria-label="Support QR Gallery" onclick="onSupportGalleryPanelClick(event)">
+      <button class="support-gallery-close" type="button" onclick="closeSupportGallery()" aria-label="Close">×</button>
+      <div id="supportGalleryStage" class="support-gallery-stage" ondblclick="toggleSupportGalleryZoom()">
+        <img id="supportGalleryImage" class="support-gallery-image" alt="Support QR Code" />
+      </div>
+      <div id="supportGalleryCaption" class="support-gallery-caption"></div>
+      <div class="support-gallery-controls">
+        <button class="support-gallery-btn" type="button" onclick="prevSupportGallery()" aria-label="Previous">‹</button>
+        <button class="support-gallery-btn" type="button" onclick="zoomOutSupportGallery()" aria-label="Zoom out">−</button>
+        <button class="support-gallery-btn" type="button" onclick="zoomInSupportGallery()" aria-label="Zoom in">+</button>
+        <span id="supportGalleryCounter" class="support-gallery-counter">1 / 4</span>
+        <button class="support-gallery-btn" type="button" onclick="nextSupportGallery()" aria-label="Next">›</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ─── i18n 翻译系统 ─────────────────────────────────────────────────────────
@@ -1396,10 +1667,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'常见问题','footer.models':'支持的模型','footer.changelog':'更新日志',
         'footer.cs':'联系客服','footer.status':'服务状态','footer.quota':'额度查询',
         'footer.terms':'用户协议','footer.privacy':'隐私政策','footer.contact':'联系我们',
-        'terminal.comment':'// 配置 Claude  Code（只需两行）','terminal.start':'# 开始编码',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Claude 教程','terminal.docs.codex':'Codex 教程','terminal.comment.claude':'// 配置 Claude','terminal.comment.codex':'// 配置 Codex','terminal.start':'# 开始编码',
         'step1.desc':'访问 <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> 注册，几秒即可完成',
         'step2.desc':'在账户设置中一键生成专属 API Key',
-        'step3.desc':'参考 <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">接入指南</a>，将 Base URL 和 Key 填入对应工具',
+        'step3.desc':'Claude 教程：<a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Codex 教程：<a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'一切就绪，享受 AI Coding 加持的开发体验',
         'mig.item1.desc':'无论余额多少，全部等值迁移，您的每一分投入都不会浪费',
         'mig.item2.desc':'遇到任何疑问，联系客服即可，我们帮您一对一处理',
@@ -1441,10 +1712,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'常見問題','footer.models':'支援的模型','footer.changelog':'更新日誌',
         'footer.cs':'聯繫客服','footer.status':'服務狀態','footer.quota':'額度查詢',
         'footer.terms':'用戶協議','footer.privacy':'隱私政策','footer.contact':'聯繫我們',
-        'terminal.comment':'// 設定 Claude  Code（只需兩行）','terminal.start':'# 開始編碼',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Claude 教程','terminal.docs.codex':'Codex 教程','terminal.comment.claude':'// 設定 Claude','terminal.comment.codex':'// 設定 Codex','terminal.start':'# 開始編碼',
         'step1.desc':'訪問 <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> 註冊，幾秒即可完成',
         'step2.desc':'在帳戶設定中一鍵生成專屬 API Key',
-        'step3.desc':'參考 <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">接入指南</a>，將 Base URL 和 Key 填入對應工具',
+        'step3.desc':'Claude 教程：<a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Codex 教程：<a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'一切就緒，享受 AI Coding 加持的開發體驗',
         'mig.item1.desc':'無論餘額多少，全部等值遷移，您的每一分投入都不會浪費',
         'mig.item2.desc':'遇到任何疑問，聯繫客服即可，我們幫您一對一處理',
@@ -1491,10 +1762,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'FAQ','footer.models':'Models','footer.changelog':'Changelog',
         'footer.cs':'Contact Support','footer.status':'Status','footer.quota':'Usage Checker',
         'footer.terms':'Terms','footer.privacy':'Privacy','footer.contact':'Contact Us',
-        'terminal.comment':'// Setup Claude  Code (just 2 lines)','terminal.start':'# Start coding',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Claude Guide','terminal.docs.codex':'Codex Guide','terminal.comment.claude':'// Setup Claude','terminal.comment.codex':'// Setup Codex','terminal.start':'# Start coding',
         'step1.desc':'Visit <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> to sign up — takes just seconds',
         'step2.desc':'Generate your API Key in account settings with one click',
-        'step3.desc':'Follow the <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">Setup Guide</a> to configure Base URL and Key',
+        'step3.desc':'Claude guide: <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Codex guide: <a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'All set! Enjoy AI-powered coding experience',
         'mig.item1.desc':'All remaining credits transferred at equal value — nothing wasted',
         'mig.item2.desc':'Got questions? Contact support for one-on-one assistance',
@@ -1536,10 +1807,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'FAQ','footer.models':'Modèles','footer.changelog':'Changelog',
         'footer.cs':'Support','footer.status':'Statut','footer.quota':"Vérifier l'usage",
         'footer.terms':'CGU','footer.privacy':'Confidentialité','footer.contact':'Contact',
-        'terminal.comment':'// Configurer Claude  Code (2 lignes)','terminal.start':'# Commencer à coder',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Guide Claude','terminal.docs.codex':'Guide Codex','terminal.comment.claude':'// Configurer Claude','terminal.comment.codex':'// Configurer Codex','terminal.start':'# Commencer à coder',
         'step1.desc':'Visitez <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> pour vous inscrire — quelques secondes',
         'step2.desc':"Générez votre clé API en un clic dans les paramètres du compte",
-        'step3.desc':'Suivez le <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">guide d\\'intégration</a> pour configurer Base URL et Key',
+        'step3.desc':'Suivez le guide Claude : <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Guide Codex : <a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'Tout est prêt ! Profitez du développement assisté par IA',
         'mig.item1.desc':'Tous les crédits restants transférés à valeur égale — rien de perdu',
         'mig.item2.desc':'Des questions ? Contactez le support pour une assistance personnalisée',
@@ -1581,10 +1852,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'よくある質問','footer.models':'モデル一覧','footer.changelog':'更新履歴',
         'footer.cs':'サポートへ連絡','footer.status':'サービス状態','footer.quota':'使用量確認',
         'footer.terms':'利用規約','footer.privacy':'プライバシー','footer.contact':'お問い合わせ',
-        'terminal.comment':'// Claude  Code を設定（2 行だけ）','terminal.start':'# コーディング開始',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Claude ガイド','terminal.docs.codex':'Codex ガイド','terminal.comment.claude':'// Claude を設定','terminal.comment.codex':'// Codex を設定','terminal.start':'# コーディング開始',
         'step1.desc':'<a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> でアカウント登録 — 数秒で完了',
         'step2.desc':'アカウント設定からワンクリックで API Key を発行',
-        'step3.desc':'<a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">導入ガイド</a>を参考に、Base URL と Key をツールに設定',
+        'step3.desc':'Claude ガイド：<a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Codex ガイド：<a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'準備完了！AI 搭載のコーディング体験をお楽しみください',
         'mig.item1.desc':'残高はすべて等価で移行 — 無駄になりません',
         'mig.item2.desc':'ご不明な点はサポートまでお気軽にお問い合わせください',
@@ -1626,10 +1897,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'FAQ','footer.models':'Модели','footer.changelog':'Изменения',
         'footer.cs':'Поддержка','footer.status':'Статус','footer.quota':'Проверка лимитов',
         'footer.terms':'Условия','footer.privacy':'Конфиденциальность','footer.contact':'Контакты',
-        'terminal.comment':'// Настройка Claude  Code (2 строки)','terminal.start':'# Начало кодирования',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Гайд Claude','terminal.docs.codex':'Гайд Codex','terminal.comment.claude':'// Настройка Claude','terminal.comment.codex':'// Настройка Codex','terminal.start':'# Начало кодирования',
         'step1.desc':'Зарегистрируйтесь на <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> — за несколько секунд',
         'step2.desc':'Сгенерируйте API-ключ в настройках аккаунта одним кликом',
-        'step3.desc':'Следуйте <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">руководству</a> для настройки Base URL и ключа',
+        'step3.desc':'Гайд Claude: <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Гайд Codex: <a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'Всё готово! Наслаждайтесь разработкой с AI',
         'mig.item1.desc':'Все оставшиеся кредиты переносятся по равной стоимости — ничего не теряется',
         'mig.item2.desc':'Есть вопросы? Обратитесь в поддержку для персональной помощи',
@@ -1671,10 +1942,10 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         'footer.faq':'FAQ','footer.models':'Mô hình','footer.changelog':'Nhật ký thay đổi',
         'footer.cs':'Hỗ trợ','footer.status':'Trạng thái','footer.quota':'Kiểm tra quota',
         'footer.terms':'Điều khoản','footer.privacy':'Quyền riêng tư','footer.contact':'Liên hệ',
-        'terminal.comment':'// Cấu hình Claude  Code (chỉ 2 dòng)','terminal.start':'# Bắt đầu code',
+        'terminal.tab.claude':'Claude','terminal.tab.codex':'Codex','terminal.docs.claude':'Hướng dẫn Claude','terminal.docs.codex':'Hướng dẫn Codex','terminal.comment.claude':'// Cấu hình Claude','terminal.comment.codex':'// Cấu hình Codex','terminal.start':'# Bắt đầu code',
         'step1.desc':'Truy cập <a href="https://fishxcode.com/register?aff=9CTW" target="_blank" class="text-purple-600 hover:underline">fishxcode.com</a> để đăng ký — chỉ vài giây',
         'step2.desc':'Tạo API Key trong cài đặt tài khoản chỉ với một cú nhấp',
-        'step3.desc':'Theo <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">hướng dẫn tích hợp</a> để cấu hình Base URL và Key',
+        'step3.desc':'Hướng dẫn Claude: <a href="https://doc.fishxcode.com/start" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/start</a><br/>Hướng dẫn Codex: <a href="https://doc.fishxcode.com/codex" target="_blank" class="text-purple-600 hover:underline">https://doc.fishxcode.com/codex</a>',
         'step4.desc':'Sẵn sàng! Tận hưởng trải nghiệm lập trình với AI',
         'mig.item1.desc':'Tất cả tín dụng còn lại được chuyển với giá trị tương đương — không lãng phí',
         'mig.item2.desc':'Có thắc mắc? Liên hệ hỗ trợ để được tư vấn riêng',
@@ -1704,8 +1975,212 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
         var copySpan = copyBtn.querySelector('[data-i18n="hero.copy"]');
         if (copySpan && t['hero.copy']) copySpan.textContent = t['hero.copy'];
       }
+      // 渲染 terminal 预览（需要在文案应用后执行）
+      renderTerminalPreview();
+
       // 更新 html lang 属性
       document.documentElement.lang = lang;
+    }
+
+    var _terminalTab = 'claude';
+
+    function _terminalCommand(tab) {
+      return tab === 'codex' ? 'codex' : 'claude';
+    }
+
+    function setTerminalTab(tab) {
+      _terminalTab = tab === 'codex' ? 'codex' : 'claude';
+      renderTerminalPreview();
+    }
+
+    function renderTerminalPreview() {
+      var t = _getT();
+      var tab = _terminalTab === 'codex' ? 'codex' : 'claude';
+      var other = tab === 'claude' ? 'codex' : 'claude';
+
+      var content = document.getElementById('terminalContent');
+      var tabClaude = document.getElementById('terminalTabClaude');
+      var tabCodex = document.getElementById('terminalTabCodex');
+      var primaryDoc = document.getElementById('terminalPrimaryDoc');
+      var secondaryDoc = document.getElementById('terminalSecondaryDoc');
+
+      if (tabClaude) {
+        var activeClaude = tab === 'claude';
+        tabClaude.classList.toggle('active', activeClaude);
+        tabClaude.setAttribute('aria-selected', activeClaude ? 'true' : 'false');
+      }
+      if (tabCodex) {
+        var activeCodex = tab === 'codex';
+        tabCodex.classList.toggle('active', activeCodex);
+        tabCodex.setAttribute('aria-selected', activeCodex ? 'true' : 'false');
+      }
+
+      if (primaryDoc) {
+        primaryDoc.href = tab === 'claude' ? 'https://doc.fishxcode.com/start' : 'https://doc.fishxcode.com/codex';
+        primaryDoc.textContent = tab === 'claude'
+          ? (t['terminal.docs.claude'] || 'Claude 教程')
+          : (t['terminal.docs.codex'] || 'Codex 教程');
+      }
+      if (secondaryDoc) {
+        secondaryDoc.href = other === 'claude' ? 'https://doc.fishxcode.com/start' : 'https://doc.fishxcode.com/codex';
+        secondaryDoc.textContent = other === 'claude'
+          ? (t['terminal.docs.claude'] || 'Claude 教程')
+          : (t['terminal.docs.codex'] || 'Codex 教程');
+      }
+
+      if (content) {
+        var comment = tab === 'claude'
+          ? (t['terminal.comment.claude'] || '// 配置 Claude')
+          : (t['terminal.comment.codex'] || '// 配置 Codex');
+
+        var configLines = tab === 'claude'
+          ? [
+            '<p><span class="kw">export</span> <span class="var">ANTHROPIC_BASE_URL</span><span class="op">=</span><span class="str">"https://fishxcode.com"</span></p>',
+            '<p><span class="kw">export</span> <span class="var">ANTHROPIC_API_KEY</span><span class="op">=</span><span class="str">"sk-..."</span></p>'
+          ]
+          : [
+            '<p><span class="kw">export</span> <span class="var">OPENAI_BASE_URL</span><span class="op">=</span><span class="str">"https://fishxcode.com/v1"</span></p>',
+            '<p><span class="kw">export</span> <span class="var">OPENAI_API_KEY</span><span class="op">=</span><span class="str">"your_api_key_here"</span></p>'
+          ];
+
+        content.innerHTML = [
+          '<p><span class="cm">' + comment + '</span></p>',
+          configLines.join(''),
+          '<p></p>',
+          '<p><span class="cm">' + (t['terminal.start'] || '# 开始编码') + '</span></p>',
+          '<p><span class="run">$</span> <span style="color:#e2e8f0">' + _terminalCommand(tab) + '</span></p>'
+        ].join('');
+      }
+    }
+
+    var _supportGalleryItems = [];
+    var _supportGalleryIndex = 0;
+    var _supportGalleryScale = 1;
+    var _supportTouchStartX = 0;
+    var _supportTouchEndX = 0;
+
+    function _collectSupportGalleryItems() {
+      return Array.prototype.slice.call(document.querySelectorAll('.support-qr-trigger')).map(function(el, idx) {
+        var text = '';
+        var labelEl = el.querySelector('span');
+        if (labelEl) text = (labelEl.textContent || '').trim();
+        return {
+          src: el.getAttribute('href') || '',
+          label: text || ('QR ' + (idx + 1))
+        };
+      }).filter(function(item) { return Boolean(item.src); });
+    }
+
+    function _applySupportGalleryZoom() {
+      var img = document.getElementById('supportGalleryImage');
+      if (!img) return;
+      img.style.transform = 'scale(' + _supportGalleryScale + ')';
+    }
+
+    function _renderSupportGallery() {
+      if (!_supportGalleryItems.length) return;
+      var item = _supportGalleryItems[_supportGalleryIndex];
+      var img = document.getElementById('supportGalleryImage');
+      var caption = document.getElementById('supportGalleryCaption');
+      var counter = document.getElementById('supportGalleryCounter');
+      if (img) {
+        img.src = item.src;
+        img.alt = item.label;
+      }
+      if (caption) caption.textContent = item.label;
+      if (counter) counter.textContent = (_supportGalleryIndex + 1) + ' / ' + _supportGalleryItems.length;
+      _supportGalleryScale = 1;
+      _applySupportGalleryZoom();
+    }
+
+    function openSupportGallery(index) {
+      _supportGalleryItems = _collectSupportGalleryItems();
+      if (!_supportGalleryItems.length) return;
+      _supportGalleryIndex = Math.max(0, Math.min(Number(index) || 0, _supportGalleryItems.length - 1));
+      var root = document.getElementById('supportGallery');
+      if (!root) return;
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('support-gallery-open');
+      _renderSupportGallery();
+    }
+
+    function closeSupportGallery() {
+      var root = document.getElementById('supportGallery');
+      if (!root) return;
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('support-gallery-open');
+    }
+
+    function onSupportGalleryPanelClick(e) {
+      if (!e) return;
+      var closeBtn = e.target && e.target.closest && e.target.closest('.support-gallery-close');
+      var controls = e.target && e.target.closest && e.target.closest('.support-gallery-controls');
+      var stage = e.target && e.target.closest && e.target.closest('.support-gallery-stage');
+      if (closeBtn || (!controls && !stage)) closeSupportGallery();
+    }
+
+    function nextSupportGallery() {
+      if (!_supportGalleryItems.length) return;
+      _supportGalleryIndex = (_supportGalleryIndex + 1) % _supportGalleryItems.length;
+      _renderSupportGallery();
+    }
+
+    function prevSupportGallery() {
+      if (!_supportGalleryItems.length) return;
+      _supportGalleryIndex = (_supportGalleryIndex - 1 + _supportGalleryItems.length) % _supportGalleryItems.length;
+      _renderSupportGallery();
+    }
+
+    function zoomInSupportGallery() {
+      _supportGalleryScale = Math.min(4, Math.round((_supportGalleryScale + 0.25) * 100) / 100);
+      _applySupportGalleryZoom();
+    }
+
+    function zoomOutSupportGallery() {
+      _supportGalleryScale = Math.max(1, Math.round((_supportGalleryScale - 0.25) * 100) / 100);
+      _applySupportGalleryZoom();
+    }
+
+    function toggleSupportGalleryZoom() {
+      _supportGalleryScale = _supportGalleryScale > 1 ? 1 : 2;
+      _applySupportGalleryZoom();
+    }
+
+    function initSupportGallery() {
+      document.querySelectorAll('.support-qr-trigger').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          var idx = Number(el.getAttribute('data-gallery-index') || '0');
+          openSupportGallery(idx);
+        });
+      });
+
+      document.addEventListener('keydown', function(e) {
+        var root = document.getElementById('supportGallery');
+        if (!root || !root.classList.contains('open')) return;
+        if (e.key === 'Escape') closeSupportGallery();
+        else if (e.key === 'ArrowRight') nextSupportGallery();
+        else if (e.key === 'ArrowLeft') prevSupportGallery();
+      });
+
+      var stage = document.getElementById('supportGalleryStage');
+      if (!stage) return;
+
+      stage.addEventListener('touchstart', function(e) {
+        if (!e.touches || !e.touches.length) return;
+        _supportTouchStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      stage.addEventListener('touchend', function(e) {
+        if (!e.changedTouches || !e.changedTouches.length) return;
+        _supportTouchEndX = e.changedTouches[0].clientX;
+        var dx = _supportTouchEndX - _supportTouchStartX;
+        if (Math.abs(dx) < 36) return;
+        if (dx < 0) nextSupportGallery();
+        else prevSupportGallery();
+      }, { passive: true });
     }
 
     // Scroll reveal
@@ -1784,6 +2259,33 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       return n.toLocaleString();
     }
 
+    function _groupStorageKey(groupKey) {
+      return 'sub-group-open:' + groupKey;
+    }
+
+    function _getGroupOpenState(groupKey, defaultOpen) {
+      try {
+        var saved = localStorage.getItem(_groupStorageKey(groupKey));
+        if (saved === '1') return true;
+        if (saved === '0') return false;
+      } catch (_) {}
+      return defaultOpen;
+    }
+
+    function _setGroupOpenState(groupKey, isOpen) {
+      try {
+        localStorage.setItem(_groupStorageKey(groupKey), isOpen ? '1' : '0');
+      } catch (_) {}
+    }
+
+    function toggleSubGroup(btn) {
+      var group = btn && btn.closest('.sub-group');
+      if (!group) return;
+      var isOpen = group.classList.toggle('open');
+      var groupKey = group.getAttribute('data-group-key') || '';
+      if (groupKey) _setGroupOpenState(groupKey, isOpen);
+    }
+
     function toggleSubDetail(btn) {
       var detail = btn && btn.nextElementSibling;
       if (!detail) return;
@@ -1798,34 +2300,32 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       if (!root) return;
 
       var t = _getT();
-      var headHtml = [
-        '<div class="sub-head">' + (t['sub.cycle.daily'] || '天订阅') + '</div>',
-        '<div class="sub-head">' + (t['sub.cycle.weekly'] || '周订阅') + '</div>',
-        '<div class="sub-head">' + (t['sub.cycle.monthly'] || '月订阅') + '</div>'
-      ].join('');
-
-      if (!matrix || !matrix.rows || !matrix.rows.length) {
-        root.innerHTML = headHtml +
-          '<div class="sub-cell"><span class="sub-coming">' + (t['sub.loadFail'] || '套餐加载失败') + '</span></div>' +
-          '<div class="sub-cell"><span class="sub-coming">' + (t['sub.loadFail'] || '套餐加载失败') + '</span></div>' +
-          '<div class="sub-cell"><span class="sub-coming">' + (t['sub.loadFail'] || '套餐加载失败') + '</span></div>';
+      if (!matrix || !matrix.groups || !matrix.groups.length) {
+        root.innerHTML = '<div class="sub-group"><div class="sub-group-body" style="display:block"><span class="sub-coming">' + (t['sub.loadFail'] || '套餐加载失败') + '</span></div></div>';
         return;
       }
 
-      var rowsHtml = matrix.rows.map(function(row) {
-        var rowCells = [row.cells.daily, row.cells.weekly, row.cells.monthly];
-        return rowCells.map(function(item) {
-          if (!item || !item.plan) {
-            return '<div class="sub-cell"><span class="sub-coming">' + (t['sub.comingSoon'] || '即将上线') + '</span></div>';
-          }
+      var cycleText = {
+        daily: t['sub.cycle.daily'] || '天订阅',
+        weekly: t['sub.cycle.weekly'] || '周订阅',
+        monthly: t['sub.cycle.monthly'] || '月订阅',
+      };
 
-          var plan = item.plan;
+      root.innerHTML = matrix.groups.map(function(group, idx) {
+        var defaultOpen = group.groupKey === 'claude';
+        var isOpen = _getGroupOpenState(group.groupKey, defaultOpen);
+
+        var cardsHtml = (group.plans || []).map(function(plan) {
           var amountLine = Number(plan.totalAmount || 0) > 0
             ? '<div>' + (t['sub.totalAmount'] || '总额度') + '：' + _fmtAmount(plan.totalAmount) + '</div>'
+            : '';
+          var cycleBadge = plan.cycleKey
+            ? '<span class="sub-cycle">' + (cycleText[plan.cycleKey] || plan.cycleKey) + '</span>'
             : '';
 
           return [
             '<div class="sub-cell">',
+            cycleBadge,
             '<div class="sub-title">' + plan.title + '</div>',
             '<div class="sub-price">' + _fmtPrice(plan.priceAmount, plan.currency) + '</div>',
             '<div class="sub-subtitle">' + (plan.subtitle || '') + '</div>',
@@ -1838,9 +2338,22 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
             '</div>'
           ].join('');
         }).join('');
-      }).join('');
 
-      root.innerHTML = headHtml + rowsHtml;
+        return [
+          '<div class="sub-group ' + (isOpen ? 'open' : '') + '" data-group-key="' + group.groupKey + '">',
+          '<button class="sub-group-head" type="button" onclick="toggleSubGroup(this)">',
+          '<span>' + group.label + '</span>',
+          '<span class="sub-group-meta">',
+          '<span>' + (group.plans ? group.plans.length : 0) + ' ' + (t['sub.planCount'] || '个套餐') + '</span>',
+          '<span class="sub-group-chevron">▶</span>',
+          '</span>',
+          '</button>',
+          '<div class="sub-group-body">',
+          '<div class="sub-cards">' + cardsHtml + '</div>',
+          '</div>',
+          '</div>'
+        ].join('');
+      }).join('');
     }
 
     async function initSubscriptionMatrix() {
@@ -1854,7 +2367,9 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
       }
     }
 
+    renderTerminalPreview();
     initSubscriptionMatrix();
+    initSupportGallery();
   </script>
 
   <script>
