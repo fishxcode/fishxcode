@@ -2,28 +2,7 @@
 
 FishXCode supports a variety of AI models from multiple providers, covering different use cases and toolchains. You can freely choose and switch models based on your needs.
 
-## Anthropic (Claude)
-
-| Model ID | Description | Recommended Use Case | Compatible Tools |
-|----------|-------------|---------------------|-----------------|
-| `claude-sonnet-4-5-20250929` | Claude Sonnet 4.5 latest, strongest overall | Complex coding, architecture design | Claude Code |
-| `claude-sonnet-4-5-20250514` | Claude Sonnet 4.5 stable | Daily coding, code review | Claude Code |
-| `claude-haiku-4-5-20251001` | Claude Haiku 4.5, balanced speed and quality | Quick completions, lightweight tasks | Claude Code |
-| `claude-3-5-haiku-20241022` | Claude 3.5 Haiku, fastest response | High-frequency calls, real-time completions | Claude Code |
-
-## OpenAI
-
-| Model ID | Description | Recommended Use Case | Compatible Tools |
-|----------|-------------|---------------------|-----------------|
-| `gpt-5` | GPT-5, OpenAI flagship model | General coding, conversational development | Codex, RooCode, Qwen Code |
-
-## Other Models
-
-| Model ID | Description | Recommended Use Case | Compatible Tools |
-|----------|-------------|---------------------|-----------------|
-| `glm-4.5` | Zhipu GLM-4.5 | General-purpose development | RooCode, Qwen Code |
-| `glm-4.6` | Zhipu GLM-4.6, improved performance | Complex reasoning, development | RooCode, Qwen Code |
-| `deepseek-v3.1` | DeepSeek V3.1, strong deep reasoning | Algorithm implementation, logical reasoning | RooCode, Qwen Code |
+<DynamicModelList />
 
 ## Switching Models
 

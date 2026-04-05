@@ -8,6 +8,7 @@ import NotFound from './NotFound.vue'
 import BackToTop from './components/BackToTop.vue'
 import AnnouncementBar from './components/AnnouncementBar.vue'
 import ModelCards from './components/ModelCards.vue'
+import DynamicModelList from './components/DynamicModelList.vue'
 import ToolWizard from './components/ToolWizard.vue'
 import Timeline from './components/Timeline.vue'
 import VideoPlayer from './components/VideoPlayer.vue'
@@ -49,6 +50,7 @@ export default {
   },
   enhanceApp({ app }) {
     app.component('ModelCards', ModelCards)
+    app.component('DynamicModelList', DynamicModelList)
     app.component('ToolWizard', ToolWizard)
     app.component('Timeline', Timeline)
     app.component('VideoPlayer', VideoPlayer)

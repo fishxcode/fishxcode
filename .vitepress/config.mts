@@ -76,6 +76,14 @@ export default withPwa(defineConfig({
   ],
   buildEnd: generateFeed,
   vite: {
+    server: {
+      proxy: {
+        '/api/pricing': {
+          target: 'https://fishxcode.com',
+          changeOrigin: true
+        }
+      }
+    },
     plugins: [
       groupIconVitePlugin()
     ]

@@ -1,8 +1,18 @@
-// @ts-nocheck
-
 type DurationUnit = "day" | "month" | "year" | string;
 type QuotaResetPeriod = "never" | "daily" | "monthly" | string;
 type CycleKey = "daily" | "weekly" | "monthly";
+type KVNamespace = {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string): Promise<void>;
+};
+
+type Env = {
+  LANDING_KV?: KVNamespace;
+  SUBSCRIPTION_API_URL?: string;
+  SUBSCRIPTION_ACCESS_TOKEN?: string;
+  SUBSCRIPTION_USER_ID?: string;
+  SUBSCRIPTION_JSON?: string;
+};
 
 type RawSubscriptionPlan = {
   id: number;
@@ -112,10 +122,7 @@ function buildSubscriptionMatrix(plans: RawSubscriptionPlan[]) {
   return { groups };
 }
 
-const port = Number(Deno.env.get("PORT")) || 8001;
-
-// Deno KV — 持久化访问计数
-const kv = await Deno.openKv();
+const VISIT_COUNTER_KEY = "landing:visits";
 
 // ─── robots.txt ────────────────────────────────────────────────────────────
 const ROBOTS_TXT = `User-agent: *
@@ -204,18 +211,15 @@ self.addEventListener('fetch', e => {
   }
 });`;
 
-const SUBSCRIPTION_API_URL = Deno.env.get("SUBSCRIPTION_API_URL") || "";
-const SUBSCRIPTION_ACCESS_TOKEN = Deno.env.get("SUBSCRIPTION_ACCESS_TOKEN") || "";
-const SUBSCRIPTION_USER_ID = Deno.env.get("SUBSCRIPTION_USER_ID") || "";
-
 type SubscriptionPayload = {
   data?: Array<{ plan?: RawSubscriptionPlan }>;
 };
 
-async function readLocalSubscriptionPlans(): Promise<RawSubscriptionPlan[]> {
+function parseSubscriptionPlans(raw: string | undefined): RawSubscriptionPlan[] {
+  if (!raw) return [];
+
   try {
-    const text = await Deno.readTextFile("../.git/subscription.json");
-    const payload = JSON.parse(text) as SubscriptionPayload;
+    const payload = JSON.parse(raw) as SubscriptionPayload;
     return (payload.data ?? [])
       .map((item) => item.plan)
       .filter((plan): plan is RawSubscriptionPlan => Boolean(plan));
@@ -224,15 +228,25 @@ async function readLocalSubscriptionPlans(): Promise<RawSubscriptionPlan[]> {
   }
 }
 
-async function fetchRemoteSubscriptionPlans(): Promise<RawSubscriptionPlan[]> {
-  if (!SUBSCRIPTION_ACCESS_TOKEN) return [];
+function getSubscriptionConfig(env: Env) {
+  return {
+    apiUrl: env.SUBSCRIPTION_API_URL?.trim() ?? "",
+    accessToken: env.SUBSCRIPTION_ACCESS_TOKEN?.trim() ?? "",
+    userId: env.SUBSCRIPTION_USER_ID?.trim() ?? "",
+    localJson: env.SUBSCRIPTION_JSON?.trim() ?? "",
+  };
+}
+
+async function fetchRemoteSubscriptionPlans(env: Env): Promise<RawSubscriptionPlan[]> {
+  const config = getSubscriptionConfig(env);
+  if (!config.apiUrl || !config.accessToken) return [];
 
   try {
-    const resp = await fetch(SUBSCRIPTION_API_URL, {
+    const resp = await fetch(config.apiUrl, {
       headers: {
         accept: "application/json",
-        Authorization: `Bearer ${SUBSCRIPTION_ACCESS_TOKEN}`,
-        "New-Api-User": SUBSCRIPTION_USER_ID,
+        Authorization: `Bearer ${config.accessToken}`,
+        ...(config.userId ? { "New-Api-User": config.userId } : {}),
       },
     });
 
@@ -247,18 +261,28 @@ async function fetchRemoteSubscriptionPlans(): Promise<RawSubscriptionPlan[]> {
   }
 }
 
-async function getSubscriptionPlans(): Promise<{ plans: RawSubscriptionPlan[]; source: "remote" | "local" | "empty" }> {
-  const remotePlans = await fetchRemoteSubscriptionPlans();
+async function getSubscriptionPlans(env: Env): Promise<{ plans: RawSubscriptionPlan[]; source: "remote" | "local" | "empty" }> {
+  const remotePlans = await fetchRemoteSubscriptionPlans(env);
   if (remotePlans.length > 0) {
     return { plans: remotePlans, source: "remote" };
   }
 
-  const localPlans = await readLocalSubscriptionPlans();
+  const localPlans = parseSubscriptionPlans(getSubscriptionConfig(env).localJson);
   if (localPlans.length > 0) {
     return { plans: localPlans, source: "local" };
   }
 
   return { plans: [], source: "empty" };
+}
+
+async function incrementVisitCount(env: Env): Promise<number> {
+  const kv = env.LANDING_KV;
+  if (!kv) return 1;
+
+  const current = Number(await kv.get(VISIT_COUNTER_KEY)) || 0;
+  const next = current + 1;
+  await kv.put(VISIT_COUNTER_KEY, String(next));
+  return next;
 }
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -2382,53 +2406,50 @@ function buildHtml(visitCount: number): string { return `<!DOCTYPE html>
 </body>
 </html>`; }
 
-Deno.serve(
-  { port, hostname: "0.0.0.0" },
-  async (req) => {
-    const path = new URL(req.url).pathname;
+function textResponse(body: BodyInit, contentType: string, cacheControl: string): Response {
+  return new Response(body, {
+    headers: {
+      "content-type": contentType,
+      "cache-control": cacheControl,
+    },
+  });
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return new Response("Method Not Allowed", {
+        status: 405,
+        headers: { allow: "GET, HEAD" },
+      });
+    }
 
     if (path === "/robots.txt") {
-      return new Response(ROBOTS_TXT, {
-        headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=86400" },
-      });
+      return textResponse(ROBOTS_TXT, "text/plain; charset=utf-8", "public, max-age=86400");
     }
 
     if (path === "/sitemap.xml") {
-      return new Response(SITEMAP_XML, {
-        headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" },
-      });
+      return textResponse(SITEMAP_XML, "application/xml; charset=utf-8", "public, max-age=3600");
     }
 
     if (path === "/manifest.json") {
-      return new Response(MANIFEST_JSON, {
-        headers: { "content-type": "application/manifest+json; charset=utf-8", "cache-control": "public, max-age=86400" },
-      });
+      return textResponse(MANIFEST_JSON, "application/manifest+json; charset=utf-8", "public, max-age=86400");
     }
 
     if (path === "/sw.js") {
-      return new Response(SW_JS, {
-        headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-cache" },
-      });
+      return textResponse(SW_JS, "application/javascript; charset=utf-8", "no-cache");
     }
 
     if (path === "/api/subscription-matrix") {
-      const { plans, source } = await getSubscriptionPlans();
+      const { plans, source } = await getSubscriptionPlans(env);
       const matrix = buildSubscriptionMatrix(plans);
       return jsonResponse({ success: true, source, matrix });
     }
 
-    // 主页 — 原子递增访问计数
-    await kv.atomic()
-      .mutate({ type: "sum", key: ["visits"], value: new Deno.KvU64(1n) })
-      .commit();
-    const entry = await kv.get<Deno.KvU64>(["visits"]);
-    const visitCount = Number(entry.value?.value ?? 1n);
-
-    return new Response(buildHtml(visitCount), {
-      headers: { "content-type": "text/html; charset=utf-8" },
-    });
+    const visitCount = await incrementVisitCount(env);
+    return textResponse(buildHtml(visitCount), "text/html; charset=utf-8", "no-store");
   },
-);
-
-console.log("FishXCode landing page → http://localhost:" + port);
-
+};

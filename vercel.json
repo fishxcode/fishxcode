@@ -1,5 +1,11 @@
 {
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/pricing",
+      "destination": "https://fishxcode.com/api/pricing"
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",

@@ -1,5 +1,9 @@
 # Using FishXCode with Codex
 
+## Video Tutorial
+
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/codex.mp4" />
+
 ## Install Codex
 
 ::: code-group

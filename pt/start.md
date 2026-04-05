@@ -4,7 +4,7 @@
 
 ## Tutorial em vídeo
 
-<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/fishxcode_claude.mp4" />
+<VideoPlayer src="https://s3.hi168.com/hi168-27900-8344owwk/claude0401.mp4" />
 
 ## 1. Preparação do ambiente
 
