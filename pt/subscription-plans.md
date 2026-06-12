@@ -13,6 +13,7 @@ Entradas comuns:
 - [Planos Claude](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans)
 - [Planos Codex](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans&plan_series=codex)
 - [Planos por número de vezes](https://fishxcode.com/pricing?currency=CNY&plan_series=mixed&plan_sort=price_asc&tab=subscription-plans)
+- [Regras de cobrança e grupos](/pt/billing-groups)
 
 ## 1. Categorias
 
@@ -28,6 +29,7 @@ Entradas comuns:
 - Planos Codex usam crédito + validade, não apenas contagem de solicitações.
 - Planos por número de vezes contam solicitações bem-sucedidas. Limites diários, mensais e totais dependem do plano e podem ser usados com modelos Claude e Codex correspondentes.
 - Claude Opus 4.8 e GPT-5.5 contam como `2.5 × solicitações bem-sucedidas reais`.
+- Para entender a relação entre preços de modelos, grupos de tokens, multiplicadores e escopo do plano, veja [Regras de cobrança e grupos](/pt/billing-groups).
 
 ## 3. Compra
 

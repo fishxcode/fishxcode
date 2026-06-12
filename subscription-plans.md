@@ -13,6 +13,7 @@ description: FishXCode 订阅套餐入口、分类和扣费口径。
 - [Claude 系列套餐](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans)
 - [Codex 系列套餐](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans&plan_series=codex)
 - [按次系列套餐](https://fishxcode.com/pricing?currency=CNY&plan_series=mixed&plan_sort=price_asc&tab=subscription-plans)
+- [站点计费规则与分组简介](/billing-groups)
 
 ## 一、套餐分类
 
@@ -28,6 +29,7 @@ description: FishXCode 订阅套餐入口、分类和扣费口径。
 - Codex 系列是按量额度 + 有效期限制，不是单纯按次售卖。
 - 按次系列是按次套餐，日上限、月上限和总次数以套餐配置为准，可用于对应的 Claude 和 Codex 系列模型。
 - Claude Opus 4.8 和 GPT-5.5 在按次数系列中按 `2.5 × 实际成功请求次数` 累计。
+- 如果需要理解模型价格、令牌分组、倍率和套餐适用范围之间的关系，请先看 [站点计费规则与分组简介](/billing-groups)。
 
 ## 三、购买流程
 

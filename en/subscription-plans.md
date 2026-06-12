@@ -13,6 +13,7 @@ Common entry points:
 - [Claude plans](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans)
 - [Codex plans](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans&plan_series=codex)
 - [By-number-of-times plans](https://fishxcode.com/pricing?currency=CNY&plan_series=mixed&plan_sort=price_asc&tab=subscription-plans)
+- [Billing rules and group overview](/en/billing-groups)
 
 ## 1. Plan Categories
 
@@ -28,6 +29,7 @@ Common entry points:
 - Codex plans are based on credit amount plus validity period. They are not simple request-count packages.
 - By-number-of-times plans count successful requests. Daily limits, monthly limits, and total counts depend on plan configuration, and they can be used with the corresponding Claude and Codex model series.
 - Claude Opus 4.8 and GPT-5.5 count as `2.5 × actual successful requests` in by-number-of-times plans.
+- To understand how model prices, token groups, multipliers, and plan scope work together, read [Billing Rules and Group Overview](/en/billing-groups).
 
 ## 3. Purchase Flow
 

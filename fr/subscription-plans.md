@@ -13,6 +13,7 @@ Liens utiles :
 - [Offres Claude](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans)
 - [Offres Codex](https://fishxcode.com/pricing?currency=CNY&tab=subscription-plans&plan_series=codex)
 - [Offres au nombre de requêtes](https://fishxcode.com/pricing?currency=CNY&plan_series=mixed&plan_sort=price_asc&tab=subscription-plans)
+- [Règles de facturation et groupes](/fr/billing-groups)
 
 ## 1. Catégories
 
@@ -28,6 +29,7 @@ Liens utiles :
 - Les offres Codex reposent sur un crédit et une durée de validité, pas seulement sur un nombre de requêtes.
 - Les offres au nombre de requêtes comptent les requêtes réussies. Les limites quotidiennes, mensuelles et totales dépendent de l'offre.
 - Claude Opus 4.8 et GPT-5.5 comptent comme `2.5 × requêtes réussies réelles`.
+- Pour comprendre le lien entre prix des modèles, groupes de tokens, multiplicateurs et périmètre d'une offre, consultez [Règles de facturation et groupes](/fr/billing-groups).
 
 ## 3. Achat
 
