@@ -298,6 +298,15 @@ export default withPwa(defineConfig({
           { text: '首页', link: '/' },
           { text: '快速开始', link: '/start' },
           {
+            text: '订阅套餐',
+            items: [
+              { text: '套餐总览', link: '/subscription-plans' },
+              { text: 'Claude', link: '/subscription-plans/claude' },
+              { text: 'Codex', link: '/subscription-plans/codex' },
+              { text: '按次套餐', link: '/subscription-plans/by-number-of-times' }
+            ]
+          },
+          {
             text: '工具指南',
             items: [
               { text: 'Claude Code', link: '/start' },
@@ -365,6 +374,15 @@ export default withPwa(defineConfig({
             ]
           },
           {
+            text: '订阅套餐',
+            items: [
+              { text: '套餐总览', link: '/subscription-plans' },
+              { text: 'Claude', link: '/subscription-plans/claude' },
+              { text: 'Codex', link: '/subscription-plans/codex' },
+              { text: '按次套餐', link: '/subscription-plans/by-number-of-times' }
+            ]
+          },
+          {
             text: '参考',
             items: [
               { text: '平台导航', link: '/platform' },
@@ -406,6 +424,15 @@ export default withPwa(defineConfig({
         nav: [
           { text: 'Home', link: '/en/' },
           { text: 'Get Started', link: '/en/start' },
+          {
+            text: 'Subscription Plans',
+            items: [
+              { text: 'Overview', link: '/en/subscription-plans' },
+              { text: 'Claude', link: '/en/subscription-plans/claude' },
+              { text: 'Codex', link: '/en/subscription-plans/codex' },
+              { text: 'By-number-of-times', link: '/en/subscription-plans/by-number-of-times' }
+            ]
+          },
           {
             text: 'Tool Guides',
             items: [
@@ -474,6 +501,15 @@ export default withPwa(defineConfig({
             ]
           },
           {
+            text: 'Subscription Plans',
+            items: [
+              { text: 'Overview', link: '/en/subscription-plans' },
+              { text: 'Claude', link: '/en/subscription-plans/claude' },
+              { text: 'Codex', link: '/en/subscription-plans/codex' },
+              { text: 'By-number-of-times', link: '/en/subscription-plans/by-number-of-times' }
+            ]
+          },
+          {
             text: 'Reference',
             items: [
               { text: 'Platform Guide', link: '/en/platform' },
@@ -515,6 +551,15 @@ export default withPwa(defineConfig({
         nav: [
           { text: 'Accueil', link: '/fr/' },
           { text: 'Démarrage rapide', link: '/fr/start' },
+          {
+            text: 'Abonnements',
+            items: [
+              { text: 'Vue d’ensemble', link: '/fr/subscription-plans' },
+              { text: 'Claude', link: '/fr/subscription-plans/claude' },
+              { text: 'Codex', link: '/fr/subscription-plans/codex' },
+              { text: 'Nombre de requêtes', link: '/fr/subscription-plans/by-number-of-times' }
+            ]
+          },
           {
             text: 'Guide des outils',
             items: [
@@ -583,6 +628,15 @@ export default withPwa(defineConfig({
             ]
           },
           {
+            text: 'Abonnements',
+            items: [
+              { text: 'Vue d’ensemble', link: '/fr/subscription-plans' },
+              { text: 'Claude', link: '/fr/subscription-plans/claude' },
+              { text: 'Codex', link: '/fr/subscription-plans/codex' },
+              { text: 'Nombre de requêtes', link: '/fr/subscription-plans/by-number-of-times' }
+            ]
+          },
+          {
             text: 'Référence',
             items: [
               { text: 'Guide plateforme', link: '/fr/platform' },
@@ -624,6 +678,15 @@ export default withPwa(defineConfig({
         nav: [
           { text: 'Inicio', link: '/es/' },
           { text: 'Comenzar', link: '/es/start' },
+          {
+            text: 'Suscripciones',
+            items: [
+              { text: 'Resumen', link: '/es/subscription-plans' },
+              { text: 'Claude', link: '/es/subscription-plans/claude' },
+              { text: 'Codex', link: '/es/subscription-plans/codex' },
+              { text: 'Por número de veces', link: '/es/subscription-plans/by-number-of-times' }
+            ]
+          },
           {
             text: 'Guía de herramientas',
             items: [
@@ -692,6 +755,15 @@ export default withPwa(defineConfig({
             ]
           },
           {
+            text: 'Suscripciones',
+            items: [
+              { text: 'Resumen', link: '/es/subscription-plans' },
+              { text: 'Claude', link: '/es/subscription-plans/claude' },
+              { text: 'Codex', link: '/es/subscription-plans/codex' },
+              { text: 'Por número de veces', link: '/es/subscription-plans/by-number-of-times' }
+            ]
+          },
+          {
             text: 'Referencia',
             items: [
               { text: 'Guía de plataforma', link: '/es/platform' },
@@ -733,6 +805,15 @@ export default withPwa(defineConfig({
         nav: [
           { text: 'Início', link: '/pt/' },
           { text: 'Começar', link: '/pt/start' },
+          {
+            text: 'Assinaturas',
+            items: [
+              { text: 'Visão geral', link: '/pt/subscription-plans' },
+              { text: 'Claude', link: '/pt/subscription-plans/claude' },
+              { text: 'Codex', link: '/pt/subscription-plans/codex' },
+              { text: 'Por número de vezes', link: '/pt/subscription-plans/by-number-of-times' }
+            ]
+          },
           {
             text: 'Guias de ferramentas',
             items: [
@@ -798,6 +879,15 @@ export default withPwa(defineConfig({
               { text: 'WorkBuddy', link: '/pt/workbuddy' },
               { text: 'CodeBuddy', link: '/pt/codebuddy' },
               { text: 'QClaw', link: '/pt/qclaw' }
+            ]
+          },
+          {
+            text: 'Assinaturas',
+            items: [
+              { text: 'Visão geral', link: '/pt/subscription-plans' },
+              { text: 'Claude', link: '/pt/subscription-plans/claude' },
+              { text: 'Codex', link: '/pt/subscription-plans/codex' },
+              { text: 'Por número de vezes', link: '/pt/subscription-plans/by-number-of-times' }
             ]
           },
           {
