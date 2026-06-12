@@ -49,6 +49,8 @@ bunx --global @openai/codex
 
    [features]
    skills = true
+   image_generation = false
+
    ```
 
 3. 创建 `~/.codex/auth.json` 文件，将 `OPENAI_API_KEY` 的值设置为你的 FishXCode API Key：

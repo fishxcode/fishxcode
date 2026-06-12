@@ -49,6 +49,8 @@ bunx --global @openai/codex
 
    [features]
    skills = true
+   image_generation = false
+
    ```
 
 3. Créez `~/.codex/auth.json`, en définissant `OPENAI_API_KEY` avec votre clé API FishXCode :
